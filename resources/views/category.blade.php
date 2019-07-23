@@ -30,7 +30,7 @@
             <div class="card-content">
                 
                 <p class="truncate">{{ $good['goods_name'] }} </p>
-                <h5 class="right-align pink-text text-lighten-2">${{ intval($good['market_price']) }}</h5>
+                <h5 class="right-align pink-text text-lighten-2">${{ intval($good['shop_price']) }}</h5>
             </div>
             
             <div class="card-action">

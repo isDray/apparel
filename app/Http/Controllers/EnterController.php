@@ -370,7 +370,8 @@ class EnterController extends Controller
                 $tmpCountry = $request->session()->get('chsCountry');
 
             }else{
-                
+
+                $request->session()->put('chsCountry', 1);
                 $tmpCountry = 1;
             }
 
@@ -386,8 +387,8 @@ class EnterController extends Controller
                 $provinces = false;
             }
             
-            // var_dump($request->session()->get('chsProvince'));
             // 設定預設的州
+
             if( $request->session()->has('chsProvince') ){
                
                 $tmpProvince = $request->session()->get('chsProvince');
@@ -434,9 +435,25 @@ class EnterController extends Controller
 
                     // 計算價格
                     $shipping_cfg = $this->unserialize_config($val['configure']);
-                    var_dump($val['shipping_code']);
-                    var_dump($shipping_cfg);
-                    echo "<br>----------------------------------<br>";
+                    //var_dump($val['shipping_code']);
+
+                    
+                    
+                    // 根據是否有購物車session , 決定計算運費的資料
+                    if( $request->session()->has('cart') ){
+                        
+                        $calcCart = $request->session()->get('cart');
+
+                    }else{
+                        
+                        $calcCart = array();
+                    }
+
+                    // 計算運費
+                    $tmpfee = $this->shipping_fee( $calcCart ,$shipping_cfg );
+                    
+                    $shipping_list[$key]['shipping_fee'] = $tmpfee['fee'];
+                    $shipping_list[$key]['shipping_fee_free'] = $tmpfee['free'];
 
 
                 }            
@@ -447,7 +464,8 @@ class EnterController extends Controller
             return view('filldata')->with([ 'title'     => '填寫資料收貨',
                                             'countrys'  => $countrys,
                                             'provinces' => $provinces,
-                                            'citys'     => $citys
+                                            'citys'     => $citys,
+                                            'shipping_list' => $shipping_list
                                           ]);            
 
 
@@ -649,31 +667,50 @@ class EnterController extends Controller
 
 
     /*----------------------------------------------------------------
-     |
+     | 計算運費
      |----------------------------------------------------------------
+     | 此運費計算模式為享愛網計費方式的精簡版本 , 由於在服飾網沒有會
+     | 員等級 , 單純以價格計算 , 所以採用相對簡單的方式
+     |
+     */
+    public function shipping_fee( $calcCarts , $cfg ){
+        
+        // 預設目前訂單為0元
+        $total = 0;
+        
+        // 計算總價
+        foreach ($calcCarts as $calcCartk => $calcCart) {
+            
+            $total += $calcCart['subTotal'];
+
+        }
+        
+        if( $total >= $cfg['free_money'] ){
+
+            return ['fee'=>0 , 'free'=>$cfg['free_money'] ];
+        
+        }else{
+
+            return ['fee'=>$cfg['base_fee'] , 'free'=>$cfg['free_money'] ];
+        }
+
+    }    
+    
+
+
+
+    /*----------
+     |
      |
      |
      */
-    function shipping_fee($shipping_code, $shipping_config, $goods_weight, $goods_amount, $goods_number=''){
-
-        if (!is_array($shipping_config)){
-            $shipping_config = unserialize($shipping_config);
-        }
-
-        $filename = ROOT_PATH . 'includes/modules/shipping/' . $shipping_code . '.php';
+    public function storeMap( Request $request ){
         
-        if (file_exists($filename)){
+        return view("storeMap");
 
-            include_once($filename);
-
-            $obj = new $shipping_code($shipping_config);
-
-            return $obj->calculate($goods_weight, $goods_amount, $goods_number);
+    }
+    public function test( Request $request ){
         
-        }else{
-            
-            return 0;
-        }
-    
-    }     
+        var_dump( $request->all() );
+    }
 }

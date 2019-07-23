@@ -8,6 +8,8 @@
 @section('content')
 
 <div class="row">
+<form action="{{url('/test')}}" method="post">
+{!! csrf_field() !!}
 <div class="col s12 m12 l12 page_main">
     
     <!-- 收貨資料區塊 -->
@@ -61,7 +63,115 @@
                 <!-- 縣市結束 -->
 
             </div>
+            
+            <!-- 配送方式 -->
+            <div class="col s12 m12 l12" id='shipArea'>
+                <span>配送方式:</span><br>
 
+                @foreach( $shipping_list as $shipping_listk => $shipping_listv)
+                <div class='col s4 m3 l3 shipBox'>
+                    <input type="radio" name="shipping" id="shipbox{{$shipping_listk}}">
+                    <label class='shipLabel' for="shipbox{{$shipping_listk}}" >
+                        {{$shipping_listv['shipping_name']}}
+                        <br>
+                        {{$shipping_listv['shipping_fee']}}
+                        <br>
+                        消費滿{{$shipping_listv['shipping_fee_free']}}免運
+                    </label>
+
+                    <span class='hideInput'>
+                        
+
+                        
+                        <table class="striped">
+  
+                            <tr>
+                                <th><font color="red">*</font>收件人</th>
+                                <td><input type="text" name="consignee" value="" class="" disabled="disabled"/>
+                            </tr>
+  
+                            <tr class="odd">
+                                <th width="80px"><font color="red">*</font>收貨地址</th>
+                                <td><input type="text" name="address" value="" class=""/></td>
+                            </tr>
+                                
+                            <tr>
+                                <th>郵遞區號</th>
+                                <td class="last"><input type="text" name="zipcode" value="" class=""/></td>
+                            </tr>  
+
+                            <tr>
+                              <th><font color="red"></font>電子郵件</th>
+                              <td class="last"><input name="email" type="text" value="" class=""/>(訂單收信用)
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <th><font color="red">*</font>手機</th>
+                              <td class="last"><input name="mobile" type="text" value="" class="" placeholder="格式:0912345678"/>
+                              </td>
+                            </tr>     
+                            <tr>
+                              <th>電話</th>
+                              <td><input type="text" name="tel" value="" class=""/></td>
+                            </tr>
+
+
+                            <tr class="odd last">
+                                <th>送貨時間</th>
+                                
+                                <td class="last">
+                                    <select name="best_time">
+                                        <option value="" >請選擇</option>
+                                        <option value="13點前" >13點前</option>
+                                        <option value="13~18點前" >13~18點前</option>
+                                        <option value="不指定" >不指定</option>
+                                    </select>
+                                    
+                                    <br>
+                                    <span style="color:#ff4899">*(使用宅配寄送用戶可選擇)</span>
+                                </td>
+                            
+                            </tr>
+                            
+                            <tr>
+                                
+                                <th>收貨備註</th>
+                                <td class="last">
+                                    <select name="sign_building">
+                                        
+                                        <option value="本人親收">
+          
+                                            本人親收
+          
+                                        </option>
+                                
+                                        <option value="管理員(警衛)代收" >管理員(警衛)代收</option>
+                                
+                                        <option value="親友代收" >親友代收</option>
+                                    
+                                    </select>
+                                    
+                                    <br>
+                                    
+                                    <span style="color:#ff4899">*(使用宅配寄送用戶可選擇)</span>
+                                </td>
+                            </tr>                                                  
+
+                        </table>                        
+
+                    </span>
+                </div>
+                @endforeach
+            </div>
+            <!-- 配送方式結束 -->
+
+            <!-- 收貨人資料 -->
+            <div class="col s12 m12 l12" id='consigneeArea'>
+
+            </div>
+            <!-- 收貨人資料結束 -->
+                                    
                      
 
         </div>
@@ -69,6 +179,9 @@
     <!-- 收貨資料區塊結束 -->
 
 </div>
+
+<input type="submit">
+</form>
 </div>
 
 @endsection
@@ -185,6 +298,33 @@ $(document).ready(function(){
         
         });        
     });     
+    
+
+
+
+    /*----------
+     |
+     |
+     |
+     */
+    $(".shipBox").click(function(){
+        
+        var chsShip = $(this);
+
+        // 清空收貨人訊息區塊
+        $("#consigneeArea").empty();
+
+        // 取消鎖定
+        $(".hideInput input").removeAttr("disabled");
+        
+        var tmpHTML = chsShip.children('.hideInput').html();
+
+        $("#consigneeArea").html( tmpHTML );
+        
+        // 恢復鎖定
+        $(".hideInput input").attr("disabled","disabled");
+    })
+
 });
 </script>
 @endsection
