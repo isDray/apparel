@@ -35,6 +35,8 @@ Route::get('/fillData','EnterController@fillData');
 
 Route::post('/areaChange','EnterController@areaChange');
 
-Route::any('/storeMap','EnterController@storeMap');
+Route::any('/storeMap/{device}/{type}','EnterController@storeMap');
 
 Route::post('/test','EnterController@test');
+
+Route::post('/shipChange','EnterController@shipChange');

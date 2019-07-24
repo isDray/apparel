@@ -1,22 +1,17 @@
 <?php
 
 $return_url ='http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://' ."{$_SERVER['HTTP_HOST']}{$_SERVER['REQUEST_URI']}";
-$status = 'get_store_map' ;
-
-if( isset($_POST['CVSStoreID']) && isset($_POST['CVSStoreName']) ){
-  //$status = 'store_call_back';
-  //$submit_url = str_replace("store_map2.php?store_type=".$_REQUEST['store_type'], "flow.php?step=checkout", $return_url);
-}
 
 //$map_url = 'http://logistics-stage.allpay.com.tw/Express/map'; // test
 //$map_url = 'https://logistics.ecpay.com.tw/Express/map';     // production
 $map_url ='https://logistics.ecpay.com.tw/Express/map';
 ?>
+
 <!doctype html>
 <html>
 <head>
   <meta charset="utf-8">
-  <title>返回享愛網</title>
+  <title>返回享愛服飾網</title>
  <style>
  * {
   box-sizing: border-box;
@@ -148,12 +143,12 @@ section {
   </ul>
 
   <form name="form1" action="<?php echo $map_url ?>" method="post" >
-    <input type="hidden" name="MerchantID" value="1032822">
+    <input type="hidden" name="MerchantID" value="3044423">
     <input type="hidden" name="LogisticsType" value="CVS">
-    <input type="hidden" name="LogisticsSubType" value="B2C">
+    <input type="hidden" name="LogisticsSubType" value="{{$type}}">
     <input type="hidden" name="IsCollection" value="N">
     <input type="hidden" name="ServerReplyURL" value="<?php echo $return_url; ?>">
-    <input type="hidden" name="Device" value="1">
+    <input type="hidden" name="Device" value="{{$device}}">
   </form>
 <?php } elseif ($status == 'store_call_back'){ ?>
 

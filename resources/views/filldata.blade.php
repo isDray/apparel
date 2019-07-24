@@ -70,7 +70,7 @@
 
                 @foreach( $shipping_list as $shipping_listk => $shipping_listv)
                 <div class='col s4 m3 l3 shipBox'>
-                    <input type="radio" name="shipping" id="shipbox{{$shipping_listk}}">
+                    <input type="radio" name="shipping" id="shipbox{{$shipping_listk}}" value="{{$shipping_listv['shipping_id']}}" @if( session()->has('chsShip') && session()->get('chsShip') == $shipping_listv['shipping_id']) checked @endif>
                     <label class='shipLabel' for="shipbox{{$shipping_listk}}" >
                         {{$shipping_listv['shipping_name']}}
                         <br>
@@ -81,10 +81,99 @@
 
                     <span class='hideInput'>
                         
-
-                        
                         <table class="striped">
-  
+                            <!-- 針對全家增設獨立表格 -->
+                            @if( $shipping_listv['shipping_code'] == 'super_get' )  
+                            <tr>
+                                <th>超商店名：</th>
+                                <td>
+                                    <input type="text" class="super_name2" name="super_name2" value="@if(session()->has('FAMI')){{session()->get('FAMI')['CVSStoreName']}}@endif" style="width:180px" readonly disabled="disabled"/>
+                                    <span id="super_get_btn" onclick="open_select_store('FAMI')" style="margin-bottom:10px">選擇全家門市</span>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <th>超商地址：</th>
+                                <td>
+                                    
+                                    <input type="text" class="super_addr2" name="super_addr2" value="@if(session()->has('FAMI')){{session()->get('FAMI')['CVSAddress']}}@endif"  readonly disabled="disabled"/>
+                            
+                                    <input type="hidden" class="super_no2" name="super_no2" value="@if(session()->has('FAMI')){{session()->get('FAMI')['CVSStoreID']}}@endif" disabled="disabled" />
+                            
+                                    <input type="hidden" value="" class="now_shipping_code" name="now_shipping_code" disabled="disabled" />
+                            
+                                    <input type="hidden" class="super_type" name="super_type" value="FAMI" disabled="disabled" />                                    
+
+                                </td>
+                            </tr>                                    
+
+                            @endif
+                            <!-- 針對全家增設獨立表格結束 -->
+
+                            <!-- 針對7-11增設獨立表格 -->
+                            @if( $shipping_listv['shipping_code'] == 'super_get2' )   
+                            <tr>
+                                <th>超商店名：</th>
+                                <td>
+                                    <input type="text" class="super_name2" name="super_name2" value="@if(session()->has('UNIMART')){{session()->get('UNIMART')['CVSStoreName']}}@endif" style="width:180px" readonly disabled="disabled" />
+                                    <span id="super_get_btn" onclick="open_select_store('UNIMART')" style="margin-bottom:10px" >選擇7-11門市</span><br>                                    
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>超商地址：</th>
+                                <td>
+                                    <input type="text" class="super_addr2" name="super_addr2" value="@if(session()->has('UNIMART')){{session()->get('UNIMART')['CVSAddress']}}@endif" readonly disabled="disabled" />
+                            
+                                    <input type="hidden" class="super_no2" name="super_no2" value="@if(session()->has('UNIMART')){{session()->get('UNIMART')['CVSStoreID']}}@endif" disabled="disabled" />
+                                
+                                    <input type="hidden" value="" class="now_shipping_code" name="now_shipping_code" disabled="disabled" />
+                                    
+                                    <input type="hidden" class="super_type" name="super_type" value="UNIMART" disabled="disabled" />  
+                                </td>
+                            </tr>                            
+                          
+                            @endif
+                            <!-- 針對7-11增設獨立表格結束 -->
+
+                            <!-- 針對萊爾富增設獨立表格 -->
+                            @if( $shipping_listv['shipping_code'] == 'super_get3' ) 
+                            <tr>
+                                <th>超商店名：</th>
+                                <td>
+                                    <input type="text" class="super_name2" name="super_name2" value="@if(session()->has('HILIFE')){{session()->get('HILIFE')['CVSStoreName']}}@endif" style="width:180px" readonly disabled="disabled"/>
+                                    <span id="super_get_btn" onclick="open_select_store('HILIFE')" style="margin-bottom:10px">選擇萊爾富門市</span>                            
+                                </td>
+                            </tr>  
+                            <tr>
+                                <th>超商地址：</th>
+                                <td>
+                                    <input type="text" class="super_addr2" name="super_addr2" value="@if(session()->has('HILIFE')){{session()->get('HILIFE')['CVSAddress']}}@endif" readonly disabled="disabled"/>
+                                    <input type="hidden" class="super_no2" name="super_no2" value="@if(session()->has('HILIFE')){{session()->get('HILIFE')['CVSStoreID']}}@endif" disabled="disabled"/>
+                                    <input type="hidden" value="" class="now_shipping_code" name="now_shipping_code" disabled="disabled"/>
+                                    <input type="hidden" class="super_type" name="super_type" value="" disabled="disabled"/>                                      
+                                </td>
+                            </tr>                                                        
+                        
+                            @endif
+                            <!-- 針對萊爾富增設獨立表格結束 -->
+                                   
+                            @if( $shipping_listv['shipping_code'] == 'super_get' || $shipping_listv['shipping_code'] == 'super_get2' || $shipping_listv['shipping_code'] == 'super_get3')
+                            <tr>
+                                <th><font color="red">*</font>收貨人：</th>
+                                <td><input type="text" class="super_consignee" name="super_consignee" value="" style="width:150px" disabled="disabled" /></td>
+                            </tr>
+                            <tr>
+                                <th><font color="red">*</font>手機：</th>
+                                <td><input type="text" class="super_mobile" name="super_mobile" value="" style="width:150px" placeholder="格式:0912345678" disabled="disabled" /></td>
+                            </tr>
+                            <tr>
+                                <th><font color="red">*</font>電子郵件：</th>
+                                <td><input type="text" class="super_email" name="super_email" value="" style="width:200px" disabled="disabled" />(訂單收信用)</td>
+                            </tr>                                                    
+                        
+                        
+                    
+                            @else
                             <tr>
                                 <th><font color="red">*</font>收件人</th>
                                 <td><input type="text" name="consignee" value="" class="" disabled="disabled"/>
@@ -156,7 +245,8 @@
                                     
                                     <span style="color:#ff4899">*(使用宅配寄送用戶可選擇)</span>
                                 </td>
-                            </tr>                                                  
+                            </tr>  
+                            @endif                                                
 
                         </table>                        
 
@@ -188,12 +278,49 @@
 
 @section('selfCss')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/filldata.css') }}">
+
+<style type="text/css">
+span#super_get_btn {
+  padding: 10px;
+  display: block;
+  color: #fff;
+  background: #333;
+  margin-top: 15px;
+  /*max-width: 50%;*/
+  cursor: pointer;
+}
+.consignee.option_inner.clearfix {
+  padding-left: 0;
+}
+
+#super_get_btn{
+  margin-left: 10px;
+  display: inline!important;
+  /*display:inline!important;*/
+  font-weight: 900;
+  border-radius: 6px;
+  font-family: '微軟正黑體';
+  background-color: #4CAF50!important; 
+  color: white; 
+  -webkit-transition-duration: 0.1s; /* Safari */
+  transition-duration: 0.1s;
+  cursor: pointer; 
+  width: auto!important;
+}
+#super_get_btn:hover{
+  -webkit-box-shadow: 2px 2px 1px 1px #316b33 inset;
+  -moz-box-shadow: 2px 2px 1px 1px #316b33 inset;
+  box-shadow: 2px 2px 1px 1px #316b33 inset;  
+}
+
+</style>
 @endsection
 
 @section('selfJs')
 <script type="text/javascript">
 $(document).ready(function(){
     
+
     /*----------------------------------------------------------------
      | 選取國家動態轉換州的內容
      |----------------------------------------------------------------
@@ -302,15 +429,35 @@ $(document).ready(function(){
 
 
 
-    /*----------
-     |
-     |
+    /*----------------------------------------------------------------
+     | 表單呈現及隱藏切換
+     |----------------------------------------------------------------
      |
      */
-    $(".shipBox").click(function(){
-        
-        var chsShip = $(this);
+    $("input[name='shipping']").change(function(){
 
+        var ship = $("input[name='shipping']:checked").val();
+
+        // 先記錄選擇了甚麼配送
+        var shipAjax = $.ajax({
+            url: "{{url('/shipChange')}}",
+            method: "POST",
+            data: { 
+                    _token : "{{ csrf_token() }}",
+                    ship : ship ,
+            },
+            dataType: "json"
+        });
+ 
+        shipAjax.done(function( res ) {
+            
+        });
+ 
+        shipAjax.fail(function( jqXHR, textStatus ) {
+        }); 
+
+        var chsShip = $("input[name='shipping']:checked").parent();
+        
         // 清空收貨人訊息區塊
         $("#consigneeArea").empty();
 
@@ -325,6 +472,56 @@ $(document).ready(function(){
         $(".hideInput input").attr("disabled","disabled");
     })
 
+    if ($("input[name='shipping']:checked").val()) {
+        
+        $("input[name='shipping']").trigger('change');
+
+    }    
+
 });
+
+
+
+
+/*----------------------------------------------------------------
+ | 判斷是否為手機
+ |----------------------------------------------------------------
+ | 此方法使用是否有觸控事件做為判斷依據 , 如果有的話 , 表示為行動
+ | 裝置 , 但是如果是有觸控螢幕的筆電會有被誤判的情形發生
+ |
+ */
+function isMobile() {
+
+  try{ document.createEvent("TouchEvent"); return true; }
+
+  catch(e){ return false;}
+
+}
+
+
+
+
+/*----------------------------------------------------------------
+ | 呼叫選取地址
+ |----------------------------------------------------------------
+ | 由於選取超商地址及編號的介面分為兩種 , 最好優先判斷是要呼叫
+ | 手機版還是電腦版 , 避免畫面跑版
+ |
+ */
+if( !isMobile() ){
+// 電腦版
+var open_select_store = function(type){
+    
+    window.open("{{url('/storeMap')}}"+"/0/"+type,'_self','');
+}
+
+}else{
+
+// 手機版
+var open_select_store = function(type){
+    
+    window.open("{{url('/storeMap')}}"+"/1/"+type,'_self','');
+}    
+}
 </script>
 @endsection
