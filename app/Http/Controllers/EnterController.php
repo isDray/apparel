@@ -460,11 +460,40 @@ class EnterController extends Controller
 
             }
             
+            // 取得付款資料
+            $payment_list = $this->available_payment_list(1,'');
+
+            if( isset($payment_list) ){
+
+                foreach ($payment_list as $key => $payment){
+                    /*
+                    if ($payment['is_cod'] == '1'){
+                        
+                        $payment_list[$key]['format_pay_fee'] = '<span id="ECS_CODFEE">' . $payment['format_pay_fee'] . '</span>';
+                    }
+                    */
+
+                    /* 如果有易寶神州行支付 如果訂單金額大於300 則不顯示 */
+                    if ($payment['pay_code'] == 'yeepayszx' && $total['amount'] > 300){
+                        
+                        unset($payment_list[$key]);
+                    }
+                    
+                    /* 如果為其它付款，則不顯示*/
+                    if ($payment['pay_code'] == 'other_cod'){
+                        
+                        unset($payment_list[$key]);
+                    } 
+
+                }
+            }
+
             return view('filldata')->with([ 'title'     => '填寫資料收貨',
                                             'countrys'  => $countrys,
                                             'provinces' => $provinces,
                                             'citys'     => $citys,
                                             'shipping_list' => $shipping_list,
+                                            'payment_list'  => $payment_list
                                           ]);            
 
 
@@ -650,7 +679,44 @@ class EnterController extends Controller
                         ->get();
 
         return $returnData;
-    }  
+    }
+
+
+
+
+    /*----------
+     |
+     |
+     |
+     */
+    public function available_payment_list($support_cod, $cod_fee = 0, $is_online = false){
+        
+        $sqlData = DB::table('payment')
+                        ->select('pay_id', 'pay_code', 'pay_name', 'pay_fee', 'pay_desc', 'pay_config', 'is_cod')
+                        ->where('enabled','=' , 1)
+                        ->orderBy('pay_order', 'asc');
+        
+
+        if (!$support_cod){   
+
+            // $sql .= 'AND is_cod = 0 '; // 如果不支持货到付款
+
+            $sqlData->where('is_cod','=',0);
+        }
+        
+        if ($is_online){
+
+            // $sql .= "AND is_online = '1' ";
+            $sqlData->where('is_online','=',1);
+        }
+
+        $returnDatas = $sqlData->get();
+        
+        $returnDatas = json_decode( $returnDatas , true );
+
+        return $returnDatas;
+    }
+
 
 
 

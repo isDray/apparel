@@ -1,5 +1,5 @@
 #fillBox{
-    border:5px solid green;
+	padding-top: 40px;
 }
 #fillBox select{
     display: inline-block;
@@ -48,7 +48,70 @@ input:checked+.shipLabel:after{
 }
 #consigneeArea{
 	margin-top: 40px;
-	border:1px solid blue;
+}
+#payArea{
+	margin-top: 40px;
+}
+.payBox{
+	text-align: center;
+}
+.payIntro{
+	display: none;
+}
+.payBox{
+	text-align: center;
+	margin-top: 10px;
+}
+.paymentLabel{
+    cursor: pointer;
+    width: 80%;
+    border:1px solid #a0a0a0;
+    display: inline-block;
+	padding-top: 10px;
+	padding-bottom: 10px;    
+    transition-duration: 0.2s;
+}
+input:checked+.paymentLabel{
+	position: relative;
+    border:1px solid #ff80ab;
+}
+input:checked+.paymentLabel:after{
+	display: inline-block;
+	font-family: 'Material Icons';
+	content: "check";
+	position: absolute;
+	top: -5px;
+	right: -5px;
+	font-size: 18px;
+	font-weight: 900;
+	color: white;
+	background-color: #ff80ab;
+	line-height: 20px;
+	text-align: center;
+	border-radius: 50%;
+	height: 20px;
+	width: 20px;
+}
+#payDesArea{
+	margin-top: 10px;
+}
+#invArea{
+	margin-top: 40px;
+}
+#companyArea{
+	margin-top: 40px;
+}
+#noteArea{
+	margin-top: 40px;
+}
+#submitArea{
+	margin-top: 40px;
+	text-align: center;
+	margin-bottom: 40px;
+}
+#submitArea input[type='submit']{
+	color: white;
+	font-weight: 900;
 }
 /*input[type="radio"]{
 
