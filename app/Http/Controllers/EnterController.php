@@ -5,7 +5,7 @@ use DB;
 use View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use App\Http\Controllers\Redirect;
 class EnterController extends Controller
 {   
     public $showNum = 20;
@@ -357,7 +357,7 @@ class EnterController extends Controller
      |
      */
     public function fillData( Request $request ){
-        
+
         // 如果根本沒有購物車 , 直接返回首頁
         if( $request->session()->has('cart') && count($request->session()->get('cart')) > 0 ){
             
@@ -503,6 +503,399 @@ class EnterController extends Controller
             return redirect('/');
 
         }
+    }
+
+
+
+
+    /*----------------------------------------------------------------
+     | 寫入訂單
+     |----------------------------------------------------------------
+     |
+     */
+    public function done( Request $request ){
+        
+
+
+        // 檢查購物車有商品 , 如果沒有購物車或者沒有商品就視為違法操作直接導回首頁
+        if( !$request->session()->has('cart') || count( $request->session()->get('cart') ) < 1 ){
+            
+            return redirect('/');
+        }
+
+        // 驗證機制 , 根據配送方式不同需要驗證的欄位也不同
+        if( !isset( $request->shipping ) || empty( $request->shipping ) ){
+
+            return redirect()->back();
+        }
+
+        if( in_array( $request->shipping , ['17','18','19'] )){
+            
+            $validationCond = [
+                'shipping'    => 'required', 
+                'super_name2' => 'required',
+                'super_addr2' => 'required',
+                'super_type'  => 'required',
+                'super_no2'   => 'required',
+                'super_consignee' => 'required',
+                'super_mobile'    => 'required|regex:/^09[0-9]{8}$/',
+                'super_email'     => 'nullable|email',
+                'payment'      => 'required', 
+                'carruer_type' => 'required',
+            ];
+            
+            $validationMsg = [   'shipping.required' => '配送方式尚未選取',
+                'super_name2.required' => '超商尚未選取',
+                'super_addr2.required' => '超商地址尚未選取',
+                'super_type.required'  => '超商地址尚未選取',
+                'super_no2.required'   => '超商地址尚未選取',
+                'super_consignee.required' => '收貨人姓名為必填',
+                'super_mobile.required' => '手機欄位為必填',
+                'super_mobile.regex'=> '手機格式錯誤',
+                'super_email.email' => '電子郵件格式錯誤',
+                'payment.required'  => '付款方式為必選',
+                'carruer_type.required' => '電子發票需選取'
+            ];
+
+            // 自然人憑證
+            if(  $request->carruer_type == 2 ){
+
+                $validationCond['ei_code'] = 'required|regex:/^[A-Z]{2}[0-9]{14}$/';
+
+                $validationMsg['ei_code.required'] = '自然人憑證需填寫';
+
+                $validationMsg['ei_code.regex'] = '自然人憑證格式錯誤';
+            }
+
+            // 手機載具
+            if(  $request->carruer_type == 3 ){
+
+                $validationCond['ei_code'] = 'required|regex:/^\/{1}[0-9A-Z\.\-\+]{7}$/';
+
+                $validationMsg['ei_code.required'] = '手機載具需填寫';
+
+                $validationMsg['ei_code.regex'] = '手機載具格式錯誤';                
+            }            
+            
+            if( !empty($request->inv_payee) || !empty($request->inv_content) ){
+
+                $validationCond['inv_payee']   = 'required';
+
+                $validationCond['inv_content'] = 'required';
+
+                $validationMsg['inv_payee.required']   = '如果需開立統編 , 統編為必填';
+
+                $validationMsg['inv_content.required'] = '如果需開立統編 , 公司抬頭為必填';
+
+            }
+            $validator = Validator::make($request->all(), $validationCond , $validationMsg );
+
+            if ($validator->fails()) {
+                
+                //var_dump($validator->errors());
+                
+            }
+        }else{
+            $validationCond = [
+                'shipping'    => 'required', 
+                'consignee'   => 'required',
+                'address'     => 'required',
+                'mobile'    => 'required|regex:/^09[0-9]{8}$/',
+                'email'     => 'nullable|email',
+                'payment'      => 'required', 
+                'carruer_type' => 'required',
+            ];
+            
+            $validationMsg = [   
+                'shipping.required' => '配送方式尚未選取',
+                'consignee.required' => '收貨人姓名為必填',
+                'address.required' => '收貨人地址為必填',
+                'mobile.required' => '手機欄位為必填',
+                'mobile.regex'=> '手機格式錯誤',
+                'email.email' => '電子郵件格式錯誤',
+                'payment.required'  => '付款方式為必選',
+                'carruer_type.required' => '電子發票需選取'
+            ];
+            // 自然人憑證
+            if(  $request->carruer_type == 2 ){
+
+                $validationCond['ei_code'] = 'required|regex:/^[A-Z]{2}[0-9]{14}$/';
+
+                $validationMsg['ei_code.required'] = '自然人憑證需填寫';
+
+                $validationMsg['ei_code.regex'] = '自然人憑證格式錯誤';
+            }
+
+            // 手機載具
+            if(  $request->carruer_type == 3 ){
+
+                $validationCond['ei_code'] = 'required|regex:/^\/{1}[0-9A-Z\.\-\+]{7}$/';
+
+                $validationMsg['ei_code.required'] = '手機載具需填寫';
+
+                $validationMsg['ei_code.regex'] = '手機載具格式錯誤';                
+            }            
+            
+            if( !empty($request->inv_payee) || !empty($request->inv_content) ){
+
+                $validationCond['inv_payee']   = 'required';
+
+                $validationCond['inv_content'] = 'required';
+
+                $validationMsg['inv_payee.required']   = '如果需開立統編 , 統編為必填';
+
+                $validationMsg['inv_content.required'] = '如果需開立統編 , 公司抬頭為必填';
+
+            }
+            $validator = Validator::make($request->all(), $validationCond , $validationMsg );       
+
+            if ($validator->fails()) {
+                
+                //var_dump($validator->errors());
+                
+            }     
+        } 
+
+        if ($validator->fails()) {
+                
+            //return redirect()->back(); 
+        }  
+        
+        //var_dump($request->all());
+        // 如果要開統編 , 則不開立一般發票
+        if( $request->inv_payee != '' ||  $request->inv_content != ''  ) $request->carruer_type = '0' ;
+
+        $inv_type = ( $request->inv_payee != '' ||  $request->inv_content != ''  ) ? '三聯式發票' : '一般發票開立' ;
+        
+        $consignee = [];
+        // 初始最後要寫入的訂單資訊 
+        $order = array(
+        'shipping_id'     => intval( $request->shipping ),
+        'pay_id'          => intval( $request->payment ),
+        'pack_id'         => 0,//isset($_POST['pack']) ? intval($_POST['pack']) : 0,
+        'card_id'         => 0,//isset($_POST['card']) ? intval($_POST['card']) : 0,
+        'card_message'    => '',//trim($_POST['card_message']),
+        'surplus'         => 0.00,//isset($_POST['surplus']) ? floatval($_POST['surplus']) : 0.00,
+        'integral'        => 0,//isset($_POST['integral']) ? intval($_POST['integral']) : 0,
+        'bonus_id'        => 0,//isset($_POST['bonus']) ? intval($_POST['bonus']) : 0,
+        'need_inv'        => 0,//empty($_POST['need_inv']) ? 0 : 1,
+        'inv_type'        => $inv_type,
+        'inv_payee'       => trim($request->inv_payee),
+        'inv_content'     => trim($request->inv_content),
+        'postscript'      => trim($request->postscript),
+        'how_oos'         => '',//isset($_LANG['oos'][$_POST['how_oos']]) ? addslashes($_LANG['oos'][$_POST['how_oos']]) : '',
+        'need_insure'     => 0,//isset($_POST['need_insure']) ? intval($_POST['need_insure']) : 0,
+        'user_id'         => 0,//$_SESSION['user_id'],
+        'add_time'        => (time() - date('Z')),
+        'order_status'    => 0,
+        'shipping_status' => 0,
+        'pay_status'      => 0,
+        'agency_id'       => 0,//get_agency_by_regions(array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district'])),
+        'carruer_type'    => trim($request->carruer_type),
+        'ei_code'         => trim($request->ei_code),
+        'from_ad_od_sn'   => 0,
+        'from_ip'         => $this->real_ip(),
+        );
+        
+        $order['extension_code'] = '';
+        $order['extension_id'] = 0;
+        
+        // 由於沒有會員 , 固定不會有積分相關資料
+        $order['surplus']  = 0;
+        $order['integral'] = 0;
+        
+        // 費用計算
+        $total = $this->order_fee( $request->session()->get('cart') );
+        
+        $order['bonus'] = 0;
+        $order['goods_amount'] = $total['goods_price'];
+        $order['discount'] = 0;
+        $order['surplus']  = 0;
+        $order['tax']      = 0;
+        $order['rent_total'] = 0;
+        $order['bonus_id'] = 0;
+
+        $shipcode = DB::table('shipping')
+                 ->select('shipping_code','shipping_name')
+                 ->where('shipping_id','=',$request->shipping)
+                 ->where('enabled','=',1)
+                 ->first();
+
+        $order['shipping_code'] = $shipcode->shipping_code;
+        
+        $super_name      =  trim($request->super_name2);
+        $super_addr      =  trim($request->super_addr2);
+        $super_no        =  trim($request->super_no2);
+        $super_consignee =  trim($request->super_consignee);
+        $super_mobile    =  trim($request->super_mobile);
+        $super_email     =  trim($request->super_email);
+
+        if( $order['shipping_code']  == 'super_get' ){
+
+        }elseif( $order['shipping_code']  == 'super_get2' ){
+
+        }elseif( $order['shipping_code']  == 'super_get3' ){
+
+        }
+
+        $showDoneString = False ; 
+
+        if( $order['shipping_code']  == 'super_get' || $order['shipping_code']  == 'super_get2' || $order['shipping_code']  == 'super_get3' ){
+            
+            $showDoneString = True;
+        }
+
+        // 除了超商配送外  , 其他物流
+        if( $order['shipping_code']  == 'ecan'  || $order['shipping_code']  == 'postoffice' || $order['shipping_code']  == 'flat'
+         || $order['shipping_code']  == 'flat_lan' || $order['shipping_code']  == 'hct' || $order['shipping_code']  == 'hct_shun'
+         || $order['shipping_code']  == 'kerry_tj' || $order['shipping_code']  == 'tjoin' || $order['shipping_code']  == 'acac'
+         ){ 
+
+            // 整理收貨人資料
+            $consignee['address']   = isset($request->address) ? trim($request->address) : '' ;
+            $consignee['consignee'] = isset($request->consignee) ? trim($request->consignee) : '' ;
+            $consignee['email']     = isset($request->email) ? trim($request->email) : '' ;
+            $consignee['zipcode']   = isset($request->zipcode) ? trim($request->zipcode) : '' ;
+            $consignee['tel']       = isset($request->tel) ? trim($request->tel) : '' ; 
+            $consignee['best_time'] = isset($request->best_time) ? trim($request->best_time) : '' ;
+            $consignee['mobile']    = isset($request->mobile) ? trim($request->mobile) : '' ;
+            $consignee['sign_building'] = isset($request->sign_building) ? trim($request->sign_building) : '' ;
+
+        }       
+
+        $order['shipping_name'] = $shipcode->shipping_name;
+
+        if( $order['shipping_code']  == 'super_get' || $order['shipping_code']  == 'super_get2' || $order['shipping_code']  == 'super_get3' ){
+            
+            $order['shipping_type'] = addslashes( $request->super_type );
+            $order['shipping_super_name'] = addslashes( $request->super_name2 );
+            $order['shipping_super_no'] = addslashes( $request->super_no2);
+            $order['shipping_super_addr'] = addslashes( $request->super_addr2 );
+            $order['address'] = addslashes( $request->super_name2 ).'_'.addslashes( $request->super_addr2 );
+
+        }   
+        
+        // 收貨人訊息轉換
+        foreach ($consignee as $key => $value){
+            
+            $order[$key] = addslashes($value);
+        }
+
+       
+        /*超商寫入*/
+        if( $order['shipping_code']  == 'super_get' || $order['shipping_code']  == 'super_get2' || $order['shipping_code']  == 'super_get3' ){
+
+            $order['mobile']    = addslashes( trim( $request->super_mobile ));
+            $order['consignee'] = addslashes( trim( $request->super_consignee));
+            $order['email']     = addslashes( trim( $request->super_email));
+            $order['tel']   = '';
+        }           
+
+        $order['scode'] = 9453;
+        
+        // 運費
+        $allFee = $this->available_shipping_list( [$request->country , $request->province ] );
+        
+        $allFee = json_decode( $allFee , true );
+        
+        // var_dump($allFee);
+        foreach ($allFee as $allFeek => $allFeev) {
+            
+            if( $allFeev['shipping_id'] == $request->shipping ){
+
+                $shipping_cfg = $this->unserialize_config($allFeev['configure']);
+
+                $tmpfee = $this->shipping_fee( $request->session()->get('cart') ,$shipping_cfg );
+                
+                break;
+            }
+        }
+        
+        $order['shipping_fee'] = ($order['goods_amount'] >= $tmpfee['free'])?0:$tmpfee['fee'];
+
+        $order['insure_fee'] = 0;
+
+        if ($order['pay_id'] > 0){
+            
+            $payment = DB::table('payment')->where('pay_id','=',$order['pay_id'])->first();
+            
+            $order['pay_name'] = addslashes( $payment->pay_name );
+        }    
+
+        $order['order_amount'] = $order['goods_amount'] + $order['shipping_fee'] + $order['tax'];
+
+        // 保留原始手機及家電
+        $mobileForMail   = $order['mobile'];
+        $telForMail      = $order['tel'];
+    
+        // 採用訂單編號執行加密後,再對該筆訂單進行更新動作
+        $order['mobile'] = empty($order['mobile']) ? '' : $this->mobileEncode( '' , $order['mobile'] );
+        $order['tel']    = empty($order['tel']) ?    '' : $this->telEncode   ( '' , $order['tel']);
+
+        // 開始寫入訂單
+        $error_no = 0;
+        
+        // $this->get_order_sn();
+        unset($order['need_inv']);
+        unset($order['need_insure']);
+        unset($order['shipping_code']);
+        
+
+        
+        $inSwitch = 1;
+        
+        do{
+            
+            $order['order_sn'] = $this->get_order_sn();
+
+            try {
+    
+                $res = DB::table('order_info')->insertGetId( $order );
+                
+                $lastID = $res;
+
+                $inSwitch = 0;
+
+            } catch (\Exception $e) {
+                
+                if (strpos( $e->getMessage() ,'1062 Duplicate entry') == false) {
+
+                    $inSwitch = 0;
+
+                }
+    
+            }
+
+        }while ( $inSwitch == 1 );
+        
+        $goodList = array_keys( $request->session()->get('cart') );
+
+        $goods = DB::table('goods')
+                    ->select('goods_id','goods_name','goods_sn','goods_number','market_price','is_real','extension_code','rent_price','upon_stock','in_stock')
+                    ->whereIn('goods_id',$goodList)
+                    ->get();
+        
+        // 轉換為陣列
+        $goods = json_decode( $goods , true );
+
+        foreach ($goods as $goodk => $good) {
+            
+            $goods[$goodk]['order_id'] = $lastID;
+            $goods[$goodk]['product_id'] = 0;
+        
+
+        }
+        // 將商品細項寫入訂單
+        exit;
+        $sql = "INSERT INTO " . $ecs->table('order_goods') . "( " .
+                "order_id, goods_id, goods_name, goods_sn, product_id, goods_number, market_price, ".
+                "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id, start_date, end_date, rent_price, upon_stock, in_stock) ".
+
+            " SELECT '$new_order_id', c.goods_id, c.goods_name, c.goods_sn, c.product_id, c.goods_number, c.market_price, c.goods_price * IFNULL( DATEDIFF( c.end_date, c.start_date ), 1), c.goods_attr, c.is_real, c.extension_code, c.parent_id, c.is_gift, c.goods_attr_id, c.start_date, c.end_date, g.rent_price, c.upon_stock, c.in_stock ".
+            " FROM " . $ecs->table('cart') ." c LEFT JOIN ". $ecs->table('goods') ." g ON c.goods_id = g.goods_id ".
+            " WHERE c.session_id = '".SESS_ID."' AND c.rec_type = '$flow_type'";
+        
+    
     }
     
 
@@ -831,6 +1224,276 @@ class EnterController extends Controller
 
 
 
+    
+    /*----------
+     |
+     |
+     |
+     */
+    function real_ip(){
+
+        static $realip = NULL;
+    
+        if ($realip !== NULL)
+        {
+            return $realip;
+        }
+    
+        if(isset($_COOKIE['real_ipd']) && !empty($_COOKIE['real_ipd'])){
+            $realip = $_COOKIE['real_ipd'];  
+            return $realip;
+        }
+        
+        if (isset($_SERVER))
+        {
+            if (isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+            {
+                $arr = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+    
+                /* 取X-Forwarded-For中第一个非unknown的有效IP字符串 */
+                foreach ($arr AS $ip)
+                {
+                    $ip = trim($ip);
+    
+                    if ($ip != 'unknown')
+                    {
+                        $realip = $ip;
+    
+                        break;
+                    }
+                }
+            }
+            elseif (isset($_SERVER['HTTP_CLIENT_IP']))
+            {
+                $realip = $_SERVER['HTTP_CLIENT_IP'];
+            }
+            else
+            {
+                if (isset($_SERVER['REMOTE_ADDR']))
+                {
+                    $realip = $_SERVER['REMOTE_ADDR'];
+                }
+                else
+                {
+                    $realip = '0.0.0.0';
+                }
+            }
+        }
+        else
+        {
+            if (getenv('HTTP_X_FORWARDED_FOR'))
+            {
+                $realip = getenv('HTTP_X_FORWARDED_FOR');
+            }
+            elseif (getenv('HTTP_CLIENT_IP'))
+            {
+                $realip = getenv('HTTP_CLIENT_IP');
+            }
+            else
+            {
+                $realip = getenv('REMOTE_ADDR');
+            }
+        }
+    
+        preg_match("/[\d\.]{7,15}/", $realip, $onlineip);
+        $realip = !empty($onlineip[0]) ? $onlineip[0] : '0.0.0.0';
+        setcookie("real_ipd", $realip, time()+36000, "/");  /*添加*/
+        return $realip;
+    }
+    
+
+
+
+    /*----------
+     |
+     |
+     |
+     */
+    function cart_goods(){
+    // $sql = "SELECT c.* ," .
+    //         " c.goods_price * c.goods_number AS subtotal, " .
+    //         " g.rent_price * c.goods_number AS rent_total " .
+    //         "FROM " . $GLOBALS['ecs']->table('cart') .' AS c ' .
+    //         'LEFT JOIN ' . $GLOBALS['ecs']->table('goods') . ' AS g ON g.goods_id = c.goods_id '.
+    //         " WHERE session_id = '" . SESS_ID . "' " .
+    //         "AND rec_type = '$type'";
+
+    // $arr = $GLOBALS['db']->getAll($sql);
+
+    // /* 格式化价格及礼包商品 */
+    // foreach ($arr as $key => $value)
+    // {
+    //     $ddays = ($value['start_date'] == '0000-00-00' && $value['end_date'] == '0000-00-00') ? 1 : diff_days($value['start_date'], $value['end_date']) ;
+    //     $arr[$key]['goods_price']  = $value['goods_price'] * $ddays;
+    //     $arr[$key]['subtotal']     = $value['subtotal'] * $ddays;
+    //     $arr[$key]['formated_market_price'] = price_format($value['market_price'], false);
+    //     //$arr[$key]['formated_goods_price']  = price_format($value['goods_price'], false);
+    //     $arr[$key]['formated_subtotal']     = price_format($arr[$key]['subtotal'], false);
+
+    //     if ($value['extension_code'] == 'package_buy')
+    //     {
+    //         $arr[$key]['package_goods_list'] = get_package_goods($value['goods_id']);
+    //     }
+    // }
+
+    // return $arr;
+}     
+    
+
+
+
+    /*----------------------------------------------------------------
+     | 計算費用相關
+     |----------------------------------------------------------------
+     |
+     */
+    public function order_fee( $carts ){
+        
+        $total  = array('real_goods_count' => 0,
+                        'gift_amount'      => 0,
+                        'goods_price'      => 0,
+                        'market_price'     => 0,
+                        'discount'         => 0,
+                        'pack_fee'         => 0,
+                        'card_fee'         => 0,
+                        'shipping_fee'     => 0,
+                        'shipping_insure'  => 0,
+                        'integral_money'   => 0,
+                        'bonus'            => 0,
+                        'surplus'          => 0,
+                        'cod_fee'          => 0,
+                        'pay_fee'          => 0,
+                        'tax'              => 0
+                  );  
+
+        // 計算商品總價
+        $tmpTotal = 0;
+        
+       // var_dump($carts);
+
+        foreach ( $carts as $cartk => $cart ) {
+            
+            $tmpTotal += $cart['subTotal'] ;
+        }
+        
+        $total['goods_price'] = $tmpTotal;
+
+        return $total;
+    }
+ 
+
+
+
+    /*----------
+     |
+     |
+     |
+     */
+    public function get_order_sn(){
+        
+        /* 选择一个随机的方案 */
+        mt_srand((double) microtime() * 1000000);
+
+        return date('Ymd') . str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT);
+    }
+
+
+
+
+    /*----------------------------------------------------------------
+     | 手機加密
+     |----------------------------------------------------------------
+     |
+     */
+    public function mobileEncode( $_key , $_num ){
+
+        $_key = '8610';
+
+        $idNums  = preg_split('//', $_key, -1, PREG_SPLIT_NO_EMPTY);
+
+        $idSum   = 0;
+  
+        foreach ($idNums as $idNumk => $idNum) {
+   
+            $idSum += $idNum;
+
+        }
+
+        $position = $idSum % mb_strlen( $_num , "utf-8");
+      
+        if( $position == 0 ){
+      
+          $mergeNum = $_num.$_key;
+      
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
+          //return base64_encode(trim(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),$mergeNum, MCRYPT_MODE_ECB, $iv)));
+          return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),$mergeNum, MCRYPT_MODE_ECB, $iv));
+          
+        }else{
+         
+          $mergeNum[0] = substr($_num, 0, $position);
+          $mergeNum[1] = $_key;
+          $mergeNum[2] = substr($_num, $position);
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
+         
+          //return base64_encode(trim(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),implode("",$mergeNum), MCRYPT_MODE_ECB, $iv)));
+          return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),implode("",$mergeNum), MCRYPT_MODE_ECB, $iv));
+      
+        }
+    }  
+
+
+
+
+    /*----------------------------------------------------------------
+     | 家電加密
+     |----------------------------------------------------------------
+     |
+     */   
+    function telEncode( $_key , $_num ){
+    
+        $_key = '8610';
+        $idNums  = preg_split('//', $_key, -1, PREG_SPLIT_NO_EMPTY);
+    
+        $idSum   = 0;
+        
+        foreach ($idNums as $idNumk => $idNum) {
+         
+          $idSum += $idNum;
+    
+    
+        }
+        $position = $idSum % mb_strlen( $_num , "utf-8");
+    
+    
+        if( $position == 0 ){
+    
+          $mergeNum = $_num.$_key;
+    
+          
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);  
+          //return base64_encode(trim(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),$mergeNum, MCRYPT_MODE_ECB, $iv)));
+          return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),$mergeNum, MCRYPT_MODE_ECB, $iv));
+    
+        }else{
+    
+          $mergeNum[0] = substr($_num, 0, $position);
+          $mergeNum[1] = $_key;
+          $mergeNum[2] = substr($_num, $position);
+    
+          $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC);
+          $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+    
+          //return base64_encode(trim(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),implode("",$mergeNum), MCRYPT_MODE_ECB, $iv)));
+          return base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, md5($_key),implode("",$mergeNum), MCRYPT_MODE_ECB, $iv));
+        }
+    }     
+
+
+
 
     /*----------------------------------------------------------------
      | 測試用function
@@ -841,4 +1504,5 @@ class EnterController extends Controller
         
         var_dump( $request->all() );
     }
+    
 }

@@ -113,6 +113,38 @@ input:checked+.paymentLabel:after{
 	color: white;
 	font-weight: 900;
 }
+span#super_get_btn {
+  padding: 10px;
+  display: block;
+  color: #fff;
+  background: #333;
+  margin-top: 15px;
+  /*max-width: 50%;*/
+  cursor: pointer;
+}
+.consignee.option_inner.clearfix {
+  padding-left: 0;
+}
+
+#super_get_btn{
+  margin-left: 10px;
+  display: inline!important;
+  /*display:inline!important;*/
+  font-weight: 900;
+  border-radius: 6px;
+  font-family: '微軟正黑體';
+  background-color: #4CAF50!important; 
+  color: white; 
+  -webkit-transition-duration: 0.1s; /* Safari */
+  transition-duration: 0.1s;
+  cursor: pointer; 
+  width: auto!important;
+}
+#super_get_btn:hover{
+  -webkit-box-shadow: 2px 2px 1px 1px #316b33 inset;
+  -moz-box-shadow: 2px 2px 1px 1px #316b33 inset;
+  box-shadow: 2px 2px 1px 1px #316b33 inset;  
+}
 /*input[type="radio"]{
 
 }*/

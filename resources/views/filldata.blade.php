@@ -8,7 +8,7 @@
 @section('content')
 
 <div class="row">
-<form action="{{url('/test')}}" method="post" id="checkout_form">
+<form action="{{url('/done')}}" method="post" id="checkout_form">
 {!! csrf_field() !!}
 <div class="col s12 m12 l12 page_main">
     
@@ -150,7 +150,7 @@
                                     <input type="text" class="super_addr2" name="super_addr2" value="@if(session()->has('HILIFE')){{session()->get('HILIFE')['CVSAddress']}}@endif" readonly disabled="disabled"/>
                                     <input type="hidden" class="super_no2" name="super_no2" value="@if(session()->has('HILIFE')){{session()->get('HILIFE')['CVSStoreID']}}@endif" disabled="disabled"/>
                                     <input type="hidden" value="" class="now_shipping_code" name="now_shipping_code" disabled="disabled"/>
-                                    <input type="hidden" class="super_type" name="super_type" value="" disabled="disabled"/>                                      
+                                    <input type="hidden" class="super_type" name="super_type" value="HILIFE" disabled="disabled"/>                                      
                                 </td>
                             </tr>                                                        
                         
@@ -167,7 +167,7 @@
                                 <td><input type="text" class="super_mobile" name="super_mobile" value="" style="width:150px" placeholder="格式:0912345678" disabled="disabled" /></td>
                             </tr>
                             <tr>
-                                <th><font color="red">*</font>電子郵件：</th>
+                                <th>電子郵件：</th>
                                 <td><input type="text" class="super_email" name="super_email" value="" style="width:200px" disabled="disabled" />(訂單收信用)</td>
                             </tr>                                                    
                         
@@ -175,7 +175,7 @@
                     
                             @else
                             <tr>
-                                <th><font color="red">*</font>收件人</th>
+                                <th><font color="red">*</font>收貨人</th>
                                 <td><input type="text" name="consignee" value="" class="" disabled="disabled"/>
                             </tr>
   
@@ -399,42 +399,6 @@
 
 @section('selfCss')
 <link rel="stylesheet" type="text/css" href="{{ asset('css/filldata.css') }}">
-
-<style type="text/css">
-span#super_get_btn {
-  padding: 10px;
-  display: block;
-  color: #fff;
-  background: #333;
-  margin-top: 15px;
-  /*max-width: 50%;*/
-  cursor: pointer;
-}
-.consignee.option_inner.clearfix {
-  padding-left: 0;
-}
-
-#super_get_btn{
-  margin-left: 10px;
-  display: inline!important;
-  /*display:inline!important;*/
-  font-weight: 900;
-  border-radius: 6px;
-  font-family: '微軟正黑體';
-  background-color: #4CAF50!important; 
-  color: white; 
-  -webkit-transition-duration: 0.1s; /* Safari */
-  transition-duration: 0.1s;
-  cursor: pointer; 
-  width: auto!important;
-}
-#super_get_btn:hover{
-  -webkit-box-shadow: 2px 2px 1px 1px #316b33 inset;
-  -moz-box-shadow: 2px 2px 1px 1px #316b33 inset;
-  box-shadow: 2px 2px 1px 1px #316b33 inset;  
-}
-
-</style>
 @endsection
 
 @section('selfJs')
@@ -655,7 +619,8 @@ $(document).ready(function(){
      |----------------------------------------------------------------
      |
      */
-    $('#checkout_form').submit(function(){
+    $('#checkout_form').submit(function(){ 
+        return true;
         
         // 立即封鎖提交按鈕 , 避免重複提交
         $("#checkOutBtn").prop('disabled', true);
@@ -953,7 +918,7 @@ var open_select_store = function(type){
 
 
 /*----------------------------------------------------------------
- |
+ | 根據選取的電子發票格式呈現不同欄位
  |----------------------------------------------------------------
  |
  */

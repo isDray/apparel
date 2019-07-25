@@ -164,9 +164,11 @@
         </footer>        
         <!-- /footer -->
         <script src="{{ asset('js/jquery.min.js') }}"></script>
+        <script src="{{ asset('js/vue.min.js') }}"></script>
         <script src="{{ asset('materialize/js/materialize.min.js') }}"></script>
         <script type="text/javascript">      
             $(document).ready(function(){
+                
                 $('.sidenav').sidenav();$('.dropdown-toggle').dropdown()
 
                 $('.dropdown-trigger').dropdown({coverTrigger:false,constrainWidth:false,closeOnClick:false});

@@ -37,6 +37,9 @@ Route::post('/areaChange','EnterController@areaChange');
 
 Route::any('/storeMap/{device}/{type}','EnterController@storeMap');
 
-Route::post('/test','EnterController@test');
-
 Route::post('/shipChange','EnterController@shipChange');
+
+Route::any('/done','EnterController@done');
+
+// 萬用測試
+Route::post('/test','EnterController@test');
