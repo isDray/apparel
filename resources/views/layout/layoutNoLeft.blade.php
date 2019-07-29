@@ -95,7 +95,7 @@
         <nav>
             <div class="nav-wrapper pink accent-1">
 
-                <a href="#!" class="brand-logo">Logo</a>
+                <a href="{{url('/')}}" class="brand-logo">Logo</a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     @foreach( $categorys as $categoryk => $category)
@@ -297,9 +297,21 @@
                             $("#dropdown1").append(newList);
                             $("#dropdown2").append(newList);
 
-                            ddinstant = M.Dropdown.getInstance( $('.dropdown-trigger') );
+                            //console.log( nowPath.str.search( 'checkout' ) );
 
-                            ddinstant.recalculateDimensions();
+                            ddinstant1 = M.Dropdown.getInstance( $('.dropdown-trigger')[0] );
+                            ddinstant1.recalculateDimensions();
+
+                            ddinstant2 = M.Dropdown.getInstance( $('.dropdown-trigger')[1] );
+                            ddinstant2.recalculateDimensions();
+
+                            var nowPath = location.pathname.toString();
+
+                            if(nowPath.indexOf('checkout') != -1){
+                                
+                                location.reload();
+
+                            }                            
                         }
                     });     
                     

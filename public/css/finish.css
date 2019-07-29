@@ -1,0 +1,18 @@
+.page_main{
+}
+#finishCollection{
+	border:0px!important;
+}
+#orderSnText{
+    font-weight: 900;
+    color: #4b4b4b;
+    border-bottom: 1px solid #a9a9a9;
+    padding-bottom: 10px;
+}
+#orderSubText{
+    font-weight: 900;
+    color: #6c6c6c;
+}
+@media( min-width: 601px ) and ( max-width: 992px){
+
+}

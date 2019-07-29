@@ -312,6 +312,14 @@
 
                             ddinstant2 = M.Dropdown.getInstance( $('.dropdown-trigger')[1] );
                             ddinstant2.recalculateDimensions();
+
+                            var nowPath = location.pathname.toString();
+
+                            if(nowPath.indexOf('checkout') != -1){
+                                
+                                 location.reload();
+
+                            }                            
                             /*ddinstant2 = M.Dropdown.getInstance( $('#dropdown2') );
                             ddinstant2.recalculateDimensions();                            */
                         }

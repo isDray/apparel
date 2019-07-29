@@ -6,6 +6,8 @@ use View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Redirect;
+use App\customLib\allpay_card;
+
 class EnterController extends Controller
 {   
     public $showNum = 20;
@@ -34,6 +36,8 @@ class EnterController extends Controller
      |
      */
     public function index( Request $request ){
+        
+        $sliders = $this->get_flash_xml();
         //$request->session()->forget('cart');
 
         // 取出服飾分類
@@ -44,6 +48,7 @@ class EnterController extends Controller
         //md5(uniqid(mt_rand(), true));
 
         return view('index')->with([ 'firstTens' => $firstTens,
+                                     'sliders'   => $sliders ,
         	                         'title'     => '首頁'
         	                       ]);
 
@@ -357,6 +362,31 @@ class EnterController extends Controller
      |
      */
     public function fillData( Request $request ){
+        // dd( $request->session()->all() );
+        // 模擬綠界付款 
+        // 取出付款資料
+        /*$paytest = DB::table('payment')->where('pay_code','allpay_card')->first();
+        
+        $tmpPayCfg = $this->unserialize_config( $paytest->pay_config );
+
+        
+
+        if( isset($tmpPayCfg['allpay_card_account']) && !empty($tmpPayCfg['allpay_card_account']) ){
+
+            $tmpPayCfg['allpay_card_iv']  = trim( $this->ecEncryptDecrypt( $tmpPayCfg['allpay_card_account'] , $tmpPayCfg['allpay_card_iv'] , 1));
+
+            $tmpPayCfg['allpay_card_key'] = trim( $this->ecEncryptDecrypt( $tmpPayCfg['allpay_card_account'] , $tmpPayCfg['allpay_card_key'], 1));
+
+        } */
+        /*$tmpPayCfg["allpay_card_test_mode"] => "yes"
+        $tmpPayCfg["allpay_card_account"] => "2000132"
+        $tmpPayCfg["allpay_card_iv"] => "5294y06JbISpM5x9"
+        $tmpPayCfg["allpay_card_key"] =>"v77hoKGq4kWxNNIS"          
+        
+        dd( $tmpPayCfg );     */
+
+
+
 
         // 如果根本沒有購物車 , 直接返回首頁
         if( $request->session()->has('cart') && count($request->session()->get('cart')) > 0 ){
@@ -693,8 +723,11 @@ class EnterController extends Controller
         'agency_id'       => 0,//get_agency_by_regions(array($consignee['country'], $consignee['province'], $consignee['city'], $consignee['district'])),
         'carruer_type'    => trim($request->carruer_type),
         'ei_code'         => trim($request->ei_code),
-        'from_ad_od_sn'   => 0,
+        'from_ad_od_sn'   => '',
         'from_ip'         => $this->real_ip(),
+        'country'         => $request->country,
+        'province'        => $request->province,
+        'city'            => $request->city 
         );
         
         $order['extension_code'] = '';
@@ -722,7 +755,7 @@ class EnterController extends Controller
                  ->first();
 
         $order['shipping_code'] = $shipcode->shipping_code;
-        
+
         $super_name      =  trim($request->super_name2);
         $super_addr      =  trim($request->super_addr2);
         $super_no        =  trim($request->super_no2);
@@ -781,7 +814,6 @@ class EnterController extends Controller
             $order[$key] = addslashes($value);
         }
 
-       
         /*超商寫入*/
         if( $order['shipping_code']  == 'super_get' || $order['shipping_code']  == 'super_get2' || $order['shipping_code']  == 'super_get3' ){
 
@@ -789,6 +821,7 @@ class EnterController extends Controller
             $order['consignee'] = addslashes( trim( $request->super_consignee));
             $order['email']     = addslashes( trim( $request->super_email));
             $order['tel']   = '';
+
         }           
 
         $order['scode'] = 9453;
@@ -839,9 +872,10 @@ class EnterController extends Controller
         unset($order['need_inv']);
         unset($order['need_insure']);
         unset($order['shipping_code']);
-        
 
-        
+
+
+
         $inSwitch = 1;
         
         do{
@@ -868,10 +902,12 @@ class EnterController extends Controller
 
         }while ( $inSwitch == 1 );
         
+        $cartArr  = $request->session()->get('cart');
+
         $goodList = array_keys( $request->session()->get('cart') );
 
         $goods = DB::table('goods')
-                    ->select('goods_id','goods_name','goods_sn','goods_number','market_price','is_real','extension_code','rent_price','upon_stock','in_stock')
+                    ->select('goods_id','goods_name','goods_sn','market_price','shop_price','is_real','extension_code','rent_price','upon_stock','in_stock')
                     ->whereIn('goods_id',$goodList)
                     ->get();
         
@@ -879,25 +915,189 @@ class EnterController extends Controller
         $goods = json_decode( $goods , true );
 
         foreach ($goods as $goodk => $good) {
+            // 訂單編號
+            $goods[$goodk]['order_id']     = $lastID;
+
+            $goods[$goodk]['product_id']   = 0;
+
+            // 商品選購數量
+            $goods[$goodk]['goods_number'] = $cartArr[ $good['goods_id'] ]['num'];
             
-            $goods[$goodk]['order_id'] = $lastID;
-            $goods[$goodk]['product_id'] = 0;
-        
+            // 商品價格 , 一律用原價
+            $goods[$goodk]['goods_price']  = $good['shop_price'];
+            
+            unset( $goods[$goodk]['shop_price'] );
+
+            $goods[$goodk]['goods_attr']  = '';
+            
+            $goods[$goodk]['parent_id']  = 0;
+
+            $goods[$goodk]['is_gift']  = 0;
 
         }
-        // 將商品細項寫入訂單
-        exit;
-        $sql = "INSERT INTO " . $ecs->table('order_goods') . "( " .
-                "order_id, goods_id, goods_name, goods_sn, product_id, goods_number, market_price, ".
-                "goods_price, goods_attr, is_real, extension_code, parent_id, is_gift, goods_attr_id, start_date, end_date, rent_price, upon_stock, in_stock) ".
 
-            " SELECT '$new_order_id', c.goods_id, c.goods_name, c.goods_sn, c.product_id, c.goods_number, c.market_price, c.goods_price * IFNULL( DATEDIFF( c.end_date, c.start_date ), 1), c.goods_attr, c.is_real, c.extension_code, c.parent_id, c.is_gift, c.goods_attr_id, c.start_date, c.end_date, g.rent_price, c.upon_stock, c.in_stock ".
-            " FROM " . $ecs->table('cart') ." c LEFT JOIN ". $ecs->table('goods') ." g ON c.goods_id = g.goods_id ".
-            " WHERE c.session_id = '".SESS_ID."' AND c.rec_type = '$flow_type'";
+        // 將商品細項寫入訂單
+        foreach ( $goods as $goodk => $good) {
+
+            DB::table('order_goods')->insertGetId( $good );
+        }
         
+        // 判斷是否要使用綠界付款 
+        if ($order['order_amount'] > 0){
+
+            if( trim( $payment->pay_code ) == 'allpay_card' ){
+                
+                $ecData = DB::table('ecset')->where('first',1)->first();
+
+                // 此段正是測試時要直接抓可用的帳號
+                if( $ecData->mid == '2000132' ){
+                     
+                    $tmpPayCfg["allpay_card_test_mode"] = "Yes";
+
+                }else{
+
+                    $tmpPayCfg["allpay_card_test_mode"] = "No";
+                }
+                
+                $tmpPayCfg["allpay_card_account"] = trim($ecData->mid);
+                $tmpPayCfg["allpay_card_iv"]  = $this->ecEncryptDecrypt( trim($ecData->mid) , trim($ecData->ec_iv) , 1);
+                $tmpPayCfg["allpay_card_key"] = $this->ecEncryptDecrypt( trim($ecData->mid) , trim($ecData->ec_key) , 1);        
+        
+                $_LANG['allpay_card'] = '<font color=blue>歐付寶 ALLPAY 信用卡</font>';
+                $_LANG['allpay_card_desc'] = ' 歐付寶 ALLPAY - <font color=red> 信用卡支付</font>';
+                $_LANG['allpay_card_test_mode'] = '測試模式？';
+                $_LANG['allpay_card_test_mode_range']['Yes'] = '是';
+                $_LANG['allpay_card_test_mode_range']['No'] = '否';
+                $_LANG['allpay_card_account'] = '商店代號(必填)';
+                $_LANG['allpay_card_iv'] = '歐付寶 ALLPAY IV(必填)';
+                $_LANG['allpay_card_key'] = '歐付寶 ALLPAY KEY(必填)';
+                $_LANG['pay_button'] = '歐付寶 ALLPAY 信用卡付款';
+                $_LANG['text_goods'] = '網路商品一批';
+                $_LANG['text_currency'] = '元';
+                $_LANG['text_paid'] = '付款完成';
+        
+                $GLOBALS['_LANG'] = $_LANG;
+        
+                $pay_obj = new allpay_card;
+
+                // 付款成功的按鈕
+                $pay_online = $pay_obj->get_code($order, $tmpPayCfg );
+
+            }else{
+
+                $pay_online = false;
+            }
+        
+        }
+
+        $shipTip = $payment->pay_desc;
+        
+        // 清除session 
+        $request->session()->forget(['cart', 'chsCountry' , 'chsShip' , 'chsCity' ,'UNIMART' ]);
+
+        // 扣除庫存
+        foreach ( $goods as $goodk => $good) {
+
+            $good['goods_number'] = intval( $good['goods_number'] );
+
+            DB::table('goods')->where('goods_id','=',$good['goods_id'] )->update(['goods_number' => DB::raw("GREATEST(goods_number - {$good['goods_number']}, 0)")]);
+
+            
+        }
+
+        // 聯盟網轉換
+        if( isset($_COOKIE['fromAffiliates']) && !empty($_COOKIE['fromAffiliates']) ){
+            /*
+            $affiliatesCh = curl_init(); 
+        
+            $affiliatesAmount =  intval( round( $order['goods_amount'] - $order['discount'] ) );
+            $revenue          =  intval( round( ( $order['goods_amount'] - $order['discount'] ) * 0.15 ) );
+
+            curl_setopt($affiliatesCh, CURLOPT_URL, "https://vbtrax.com/track/postback/conversions/8/global?order={$order['order_sn']}&order_total={$affiliatesAmount}&revenue={$revenue}&server_subid={$_COOKIE['fromAffiliates']}&step=sale"); 
     
+            curl_setopt($affiliatesCh, CURLOPT_RETURNTRANSFER, 1); 
+    
+    
+            $affiliatesOutput = curl_exec($affiliatesCh); 
+    
+            $affiliatesOutput = json_decode($affiliatesOutput,true);
+    
+            curl_close($affiliatesCh);
+            
+            $fileName = date("Y-m-d").'_log.txt';        
+            
+            $file = fopen( public_path("/affiliates/$fileName"),"a+");
+    
+            fwrite($file,"訂單編號:".$order['order_sn']);
+            fwrite($file,"\r\n");
+            fwrite($file,"聯盟網id:".$_COOKIE['fromAffiliates']);
+            fwrite($file,"\r\n");
+            fwrite($file,"佣金:".$revenue);
+            fwrite($file,"\r\n");
+            fwrite($file,"回傳結果:\r\n");        
+            fwrite($file, print_r($affiliatesOutput, TRUE));
+            fwrite($file,"\r\n\r\n-------------------------------------\r\n\r\n");
+            fclose($file);
+            */
+            
+            // 存入聯盟網訂單專用表
+            $affiliatesArr = [ 'order_id'  => $lastID,
+                               'order_sn'  => $order['order_sn'],
+                               'revenue'   => 123,//$revenue,
+                               'status'    => 0, 
+                               'add_time'  => time() - date('Z'),
+                               'edit_time' => time() - date('Z'),
+                             ];
+
+            DB::table('affiliates')->insert( $affiliatesArr );                             
+    
+            // 結帳完後移除cookies
+            unset($_COOKIE['fromAffiliates']);
+            setcookie("fromAffiliates", "", time() - 300,"/");
+        
+        }        
+        // 聯盟網轉換結束      
+     
+        return view('finish')->with([ 'title' => '訂購完成' ,
+                                      'order_sn' => $order['order_sn'],
+                                      'ship_way' => $order['shipping_name'],
+                                      'pay_way'  => $order['pay_name'],
+                                      'order_amount'   => $order['order_amount'],
+                                      'showDoneString' => $showDoneString,
+                                      'shipTip'        => $shipTip,
+                                      'pay_online'     => $pay_online
+                                    ]);
     }
+
     
+    /*----------------------------------------------------------------
+     | 交易成功之介面
+     |----------------------------------------------------------------
+     |
+     */
+    public function payed( Request $request ){
+
+        if( isset( $request->RtnCode ) && $request->RtnCode == 1){
+            
+            $order_sn = $request->MerchantTradeNo;
+            
+            //$order = DB::table('order_info')->where('order_sn',$order_sn)->first();
+
+            return view('payed')->with([  'title'    => '付款結果',
+                                          'res'      => true,
+                                          'order_sn' => $order_sn
+                                       ]);
+        }else{
+            
+            return view('payed')->with([  'title'    => '付款結果',
+                                          'res'      => false,
+
+                                       ]);            
+        }
+        
+
+    }
+
 
 
 
@@ -1225,8 +1425,9 @@ class EnterController extends Controller
 
 
     
-    /*----------
-     |
+    /*----------------------------------------------------------------
+     | 取出購買者ip
+     |----------------------------------------------------------------
      |
      |
      */
@@ -1300,46 +1501,8 @@ class EnterController extends Controller
         setcookie("real_ipd", $realip, time()+36000, "/");  /*添加*/
         return $realip;
     }
+        
     
-
-
-
-    /*----------
-     |
-     |
-     |
-     */
-    function cart_goods(){
-    // $sql = "SELECT c.* ," .
-    //         " c.goods_price * c.goods_number AS subtotal, " .
-    //         " g.rent_price * c.goods_number AS rent_total " .
-    //         "FROM " . $GLOBALS['ecs']->table('cart') .' AS c ' .
-    //         'LEFT JOIN ' . $GLOBALS['ecs']->table('goods') . ' AS g ON g.goods_id = c.goods_id '.
-    //         " WHERE session_id = '" . SESS_ID . "' " .
-    //         "AND rec_type = '$type'";
-
-    // $arr = $GLOBALS['db']->getAll($sql);
-
-    // /* 格式化价格及礼包商品 */
-    // foreach ($arr as $key => $value)
-    // {
-    //     $ddays = ($value['start_date'] == '0000-00-00' && $value['end_date'] == '0000-00-00') ? 1 : diff_days($value['start_date'], $value['end_date']) ;
-    //     $arr[$key]['goods_price']  = $value['goods_price'] * $ddays;
-    //     $arr[$key]['subtotal']     = $value['subtotal'] * $ddays;
-    //     $arr[$key]['formated_market_price'] = price_format($value['market_price'], false);
-    //     //$arr[$key]['formated_goods_price']  = price_format($value['goods_price'], false);
-    //     $arr[$key]['formated_subtotal']     = price_format($arr[$key]['subtotal'], false);
-
-    //     if ($value['extension_code'] == 'package_buy')
-    //     {
-    //         $arr[$key]['package_goods_list'] = get_package_goods($value['goods_id']);
-    //     }
-    // }
-
-    // return $arr;
-}     
-    
-
 
 
     /*----------------------------------------------------------------
@@ -1384,9 +1547,9 @@ class EnterController extends Controller
 
 
 
-    /*----------
-     |
-     |
+    /*----------------------------------------------------------------
+     | 產生訂單編號
+     |----------------------------------------------------------------
      |
      */
     public function get_order_sn(){
@@ -1496,13 +1659,121 @@ class EnterController extends Controller
 
 
     /*----------------------------------------------------------------
+     | 綠界解密
+     |----------------------------------------------------------------
+     |
+     */
+    public function ecEncryptDecrypt($_mid, $_code, $decrypt){ 
+    
+        if($decrypt){ 
+    
+            $decrypted = rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($_mid), base64_decode($_code), MCRYPT_MODE_CBC, md5(md5($_mid))), "12");
+            $idNums  = preg_split('//', $_mid, -1, PREG_SPLIT_NO_EMPTY);
+    
+            $idSum   = 0;
+      
+            foreach ($idNums as $idNumk => $idNum) {
+       
+                $idSum += $idNum;
+    
+            }
+    
+            $position = $idSum % 16;
+    
+            $keylen = strlen($_mid);
+            $mergeNum[0] = substr($decrypted, 0, $position);
+            $mergeNum[1] = substr($decrypted, ( $position+$keylen ) );
+            
+            $decrypted=implode("",$mergeNum);
+            
+            return $decrypted;
+    
+        }else{ 
+            $idNums  = preg_split('//', $_mid, -1, PREG_SPLIT_NO_EMPTY);
+    
+            $idSum   = 0;
+      
+            foreach ($idNums as $idNumk => $idNum) {
+        
+                $idSum += $idNum;
+    
+            }
+    
+            $position = $idSum % 16;
+    
+    
+            $mergeNum[0] = substr($_code, 0, $position);
+            $mergeNum[1] = $_mid;
+            $mergeNum[2] = substr($_code, $position);
+            
+            $encrypted = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($_mid), implode("", $mergeNum), MCRYPT_MODE_CBC, md5(md5($_mid)))); 
+            return $encrypted; 
+        } 
+    }     
+
+
+
+
+    /*----------------------------------------------------------------
      | 測試用function
      |----------------------------------------------------------------
      |
      */
     public function test( Request $request ){
         
-        var_dump( $request->all() );
+        //var_dump( $request->all() );
+
+        return view('payed')->with([  'title'    => '付款結果',
+                                      'res'      => true,
+                                      'order_sn' => 'MerchantTradeNo'
+                                   ]);
     }
-    
+
+
+
+
+    /*----------
+     |
+     |
+     |
+     */
+    function get_flash_xml(){
+        $xmlStr = simplexml_load_file('http://127.0.0.1/***REMOVED***2/data/flash_carousel_data.xml');
+        //$slider = simplexml_load_string( $xmlStr );
+        $sliders = json_decode(json_encode((array)$xmlStr), TRUE)['item'];
+        
+        $returnData = [];
+        foreach ($sliders as $sliderk => $slider) {
+            $returnData[] = [ 'p'=>$slider["@attributes"]["item_url"],
+                              'm'=>$slider["@attributes"]["src_mobile"]
+                            ];
+            //$returnData[] = ['p'=>];
+        }
+
+        return $returnData;
+        //var_dump($xmlStr);
+       // echo json_decode( $xmlStr , true);
+        /*$ROOT_PATH = 'http://127.0.0.1/';
+        $DATA_DIR  = '/***REMOVED***2/data/flash_carousel_data.xml';
+
+        $flashdb = array();
+        if (file_exists($ROOT_PATH . $DATA_DIR . '/flash_carousel_data.xml')){
+
+            // 兼容v2.7.0及以前版本
+            if (!preg_match_all('/item_url="([^"]+)"\slink="([^"]+)"\stext="([^"]*)"\ssort="([^"]*)"\ssrc_mobile="([^"]*)"/', file_get_contents(ROOT_PATH . DATA_DIR . '/flash_carousel_data.xml'), $t, PREG_SET_ORDER)){
+                preg_match_all('/item_url="([^"]+)"\slink="([^"]+)"\stext="([^"]*)"/', file_get_contents(ROOT_PATH . DATA_DIR . '/flash_carousel_data.xml'), $t, PREG_SET_ORDER);
+            }
+        
+            if (!empty($t)){
+
+                foreach ($t as $key => $val){
+
+                    $val[4] = isset($val[4]) ? $val[4] : 0;
+                    $flashdb[] = array('src'=>$val[1],'url'=>$val[2],'text'=>$val[3],'sort'=>$val[4],'src_mobile'=>$val[5]);
+                }
+            }
+        }
+        
+        return $flashdb;*/
+    }
 }

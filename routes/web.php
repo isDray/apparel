@@ -15,6 +15,7 @@
     return view('welcome');
 });*/
 
+
 Route::get('/','EnterController@index');
 
 Route::post('/addToCart','EnterController@addToCart');
@@ -41,5 +42,7 @@ Route::post('/shipChange','EnterController@shipChange');
 
 Route::any('/done','EnterController@done');
 
+Route::any('/payed','EnterController@payed');
+
 // 萬用測試
-Route::post('/test','EnterController@test');
+Route::get('/test','EnterController@test');

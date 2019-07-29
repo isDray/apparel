@@ -27,6 +27,18 @@ class InitMiddleware
      */
     public function handle($request, Closure $next)
     {   
+
+
+
+        if( (isset($_GET['utm_source']) && $_GET['utm_source'] =='affiliates') && ( !empty($_GET['vtm_stat_id']) ) ){
+            
+            $fromAffiliates = trim($_GET['vtm_stat_id']);
+             
+            //setcookie('fromAffiliates', $fromAffiliates , time() + (86400 * 30), "/"); 
+            //$coores=cookie('fromAffiliates', $fromAffiliates , (1440 * 30));
+            setcookie("fromAffiliates",$fromAffiliates,time() + (86400 * 30) , "/");
+            
+        }
         // 初始化客製srssion類別
         
         //$sess = new cls_session( 'sessions' , 'sessions_data' );

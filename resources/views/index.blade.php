@@ -14,10 +14,10 @@
 <div class='row scrollspy ' id="introduction">
 
     <div id="indexCarousel" class="carousel carousel-slider center col s12 m12 ">
-        <a class="carousel-item" href="#one!"><img src="https://***REMOVED***.com/***REMOVED***/data/afficheimg/20181121pldish.jpg"></a>
-        <a class="carousel-item" href="#two!"><img src="https://***REMOVED***.com/***REMOVED***/data/afficheimg/20180914ihoisd.jpg"></a>
-        <a class="carousel-item" href="#three!"><img src="https://***REMOVED***.com/***REMOVED***/data/afficheimg/20181025kttqec.jpg"></a>
+        @foreach($sliders as $sliderk => $slider)
+        <a class="carousel-item" href="#one!"><img src="http://127.0.0.1/***REMOVED***2/{{$slider['p']}}"></a>
 
+        @endforeach
         <div class='pre'>
             <i class="medium material-icons  blue-grey-text text-lighten-5">chevron_left</i>
         </div>
