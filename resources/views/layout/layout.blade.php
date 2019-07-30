@@ -52,6 +52,8 @@
                 $cartTotal += $cartdata['subTotal'];
             @endphp
             @endforeach
+
+            @if( count(Session::get('cart')) )
             <li>
             <div class='right-align' style='padding-right:15px;'>
                 共:{{$cartTotal}}
@@ -60,6 +62,12 @@
                 <a href="{{url('/checkout')}}" class="waves-effect waves-light btn">去結帳</a>
             </div>
             </li>
+            @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>
+            @endif
+
         @endif
         </ul>
         <ul id='dropdown1' class='dropdown-content collection'>
@@ -80,6 +88,7 @@
                 $cartTotal += $cartdata['subTotal'];
             @endphp
             @endforeach
+            @if( count(Session::get('cart')) )
             <li>
             <div class='right-align' style='padding-right:15px;'>
                 共:{{$cartTotal}}
@@ -88,6 +97,11 @@
                 <a  href="{{url('/checkout')}}" class="waves-effect waves-light btn">去結帳</a>
             </div>
             </li>
+            @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>
+            @endif
         @endif
         </ul>
 
@@ -95,7 +109,7 @@
         <nav>
             <div class="nav-wrapper pink accent-1">
 
-                <a href="{{url('/')}}" class="brand-logo">Logo</a>
+                <a href="{{url('/')}}" class="brand-logo"><img src="https://***REMOVED***.com/***REMOVED***/ecs_static/img/logo.png"></a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     @foreach( $categorys as $categoryk => $category)
@@ -141,24 +155,32 @@
           <div class="container">
             <div class="row">
               <div class="col l6 s12">
-                <h5 class="white-text">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+                <h5 class="white-text">聯絡資訊</h5>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服專線：(04)874-0413</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服手機：0915-588-683</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服Line ID： @***REMOVED***</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>聯絡信箱：mykk97956@yahoo.com.tw</p>
+
+
+
+
+ 
               </div>
               <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Links</h5>
+                <h5 class="white-text">購物連結</h5>
                 <ul>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://***REMOVED***.com/***REMOVED***" target="_blank" >享愛網</a></li>
+<!--                   <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 2</a></li>
+                  <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 3</a></li>
+                  <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 4</a></li> -->
                 </ul>
               </div>
             </div>
           </div>
           <div class="footer-copyright">
             <div class="container">
-            © 2014 Copyright Text <span id="app">@{{ message }}</span>
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            © {{ date('Y')}} 享愛網情趣用品 版權所有 <span id="app"></span>
+            <!-- <a class="grey-text text-lighten-4 right" href="#!">More Links</a> -->
             </div>
           </div>
         </footer>        
@@ -285,6 +307,8 @@
                             newList = "";
 
                             tmpCartTotal = 0;
+                            
+                            console.log(res[2]);
 
                             $.each(res[2], function( reCartK , reCartV ) {                    
                                 
@@ -298,11 +322,17 @@
                                 newList += "</li>";
                                 tmpCartTotal += reCartV['subTotal'];
                             }); 
-                
-                            newList += "<li>";
-                            newList += "<div class='right-align' style='padding-right:15px;'>共:"+tmpCartTotal+"</div>";
-                            newList += "<div class='right-align'><a href='{{url('/checkout')}}' class='waves-effect waves-light btn'>去結帳</a></div>";
-                            newList += "</li>";
+                            if( Object.keys(res[2]).length > 0){
+                                newList += "<li>";
+                                newList += "<div class='right-align' style='padding-right:15px;'>共:"+tmpCartTotal+"</div>";
+                                newList += "<div class='right-align'><a href='{{url('/checkout')}}' class='waves-effect waves-light btn'>去結帳</a></div>";
+                                newList += "</li>";
+                            }
+
+                            if( Object.keys(res[2]).length < 1){
+
+                               newList += "<li class='emptycart' >購物車內無商品</li>"; 
+                            }
 
                             $("#dropdown1").append(newList);
                             $("#dropdown2").append(newList);

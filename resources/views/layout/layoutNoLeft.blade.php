@@ -132,24 +132,32 @@
           <div class="container">
             <div class="row">
               <div class="col l6 s12">
-                <h5 class="white-text">Footer Content</h5>
-                <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+                <h5 class="white-text">聯絡資訊</h5>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服專線：(04)874-0413</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服手機：0915-588-683</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>客服Line ID： @***REMOVED***</p>
+                <p class="grey-text text-lighten-4"><i class="material-icons tiny">keyboard_arrow_right</i>聯絡信箱：mykk97956@yahoo.com.tw</p>
+
+
+
+
+ 
               </div>
               <div class="col l4 offset-l2 s12">
-                <h5 class="white-text">Links</h5>
+                <h5 class="white-text">購物連結</h5>
                 <ul>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
-                  <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://***REMOVED***.com/***REMOVED***" target="_blank" >享愛網</a></li>
+<!--                   <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 2</a></li>
+                  <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 3</a></li>
+                  <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 4</a></li> -->
                 </ul>
               </div>
             </div>
           </div>
           <div class="footer-copyright">
             <div class="container">
-            © 2014 Copyright Text <span id="app">@{{ message }}</span>
-            <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+            © {{ date('Y')}} 享愛網情趣用品 版權所有 <span id="app"></span>
+            <!-- <a class="grey-text text-lighten-4 right" href="#!">More Links</a> -->
             </div>
           </div>
         </footer>        

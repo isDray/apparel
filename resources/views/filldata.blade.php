@@ -15,8 +15,19 @@
     <!-- 收貨資料區塊 -->
     <div class="row">
         
+        @if ($errors->any())
+
+            <ul class="collection with-header col s12 m12 l8 offset-l2" style="padding:0px;">
+            <li class="collection-header  orange darken-3"><h6>錯誤訊息</h6></li>
+            @foreach ($errors->all() as $error)
+            <li class="collection-item">{{$error}}</li>
+            @endforeach
+            </ul>
+
+        @endif
         <div class="col s12 m12 l8 offset-l2 z-depth-5 " id="fillBox">
-            
+
+      
             <div class="col s12 m12 l12">
             <span>配送區域:</span>
                 

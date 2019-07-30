@@ -178,6 +178,7 @@ $(document).ready(function(){
 
                 // 清空原始購物車
                 $("#dropdown1").empty();
+                $("#dropdown2").empty();
 
                 // 產生新購物車
                 newList = "";
@@ -201,6 +202,7 @@ $(document).ready(function(){
                 newList += "</li>";
 
                 $("#dropdown1").append(newList);
+                $("#dropdown2").append(newList);
 
             }else{
                 

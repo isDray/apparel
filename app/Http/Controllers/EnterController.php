@@ -11,6 +11,7 @@ use App\customLib\allpay_card;
 class EnterController extends Controller
 {   
     public $showNum = 20;
+
     /*----------------------------------------------------------------
      | 控制器初始化
      |----------------------------------------------------------------
@@ -37,18 +38,28 @@ class EnterController extends Controller
      */
     public function index( Request $request ){
         
+        // 取出輪播資料
         $sliders = $this->get_flash_xml();
-        //$request->session()->forget('cart');
 
-        // 取出服飾分類
-        $firstTens = DB::table('goods')->where('cat_id', 25)->limit(6)->offset(60)->orderBy('add_time','DESC')->get();
+        // 最新商品 
+        /*$firstTens = DB::table('goods')->whereIn('cat_id', [25,103,31,104,113,27,29])->where('is_on_sale','1')->where('goods_number','>','0')->limit(6)->offset(0)->orderBy('add_time','DESC')->get();
         
-        $firstTens = json_decode( $firstTens , TRUE);
-        
-        //md5(uniqid(mt_rand(), true));
+        $firstTens = json_decode( $firstTens , TRUE);*/
+       
+        // 熱銷商品 
+        $news = $this->get_recommend( 'new' );
 
-        return view('index')->with([ 'firstTens' => $firstTens,
-                                     'sliders'   => $sliders ,
+        // 熱銷商品
+        $hots = $this->get_recommend( 'hot' );
+
+        // 推薦商品
+        $bests = $this->get_recommend( 'best' );
+
+        return view('index')->with([ 'firstTens' => $news,
+                                     'sliders'   => $sliders,
+                                     'bests'     => $bests,
+                                     'hots'      => $hots,
+
         	                         'title'     => '首頁'
         	                       ]);
 
@@ -687,10 +698,11 @@ class EnterController extends Controller
         } 
 
         if ($validator->fails()) {
-                
+            
+            return redirect()->back()->withErrors($validator);
             //return redirect()->back(); 
         }  
-        
+
         //var_dump($request->all());
         // 如果要開統編 , 則不開立一般發票
         if( $request->inv_payee != '' ||  $request->inv_content != ''  ) $request->carruer_type = '0' ;
@@ -1732,48 +1744,159 @@ class EnterController extends Controller
 
 
 
-    /*----------
-     |
-     |
+    /*----------------------------------------------------------------
+     | 取出輪播資料
+     |----------------------------------------------------------------
      |
      */
     function get_flash_xml(){
-        $xmlStr = simplexml_load_file('http://127.0.0.1/***REMOVED***2/data/flash_carousel_data.xml');
+
+        $xmlStr = simplexml_load_file('http://***REMOVED***.com/***REMOVED***/data/flash_carousel_data.xml');
+    
         //$slider = simplexml_load_string( $xmlStr );
         $sliders = json_decode(json_encode((array)$xmlStr), TRUE)['item'];
-        
+    
+
         $returnData = [];
+
         foreach ($sliders as $sliderk => $slider) {
-            $returnData[] = [ 'p'=>$slider["@attributes"]["item_url"],
-                              'm'=>$slider["@attributes"]["src_mobile"]
-                            ];
-            //$returnData[] = ['p'=>];
+
+            if( array_key_exists('@attributes', $slider)){
+
+                $returnData[] = [ 'p'    => (strpos($slider["@attributes"]["item_url"], 'http') !== false)? $slider["@attributes"]["item_url"]: 'http://***REMOVED***.com/***REMOVED***/'.$slider["@attributes"]["item_url"],
+                                  'm'    => (strpos($slider["@attributes"]["src_mobile"], 'http') !== false)? $slider["@attributes"]["src_mobile"]: 'http://***REMOVED***.com/***REMOVED***/'.$slider["@attributes"]["src_mobile"],
+                                  'text' => $slider["@attributes"]["text"],
+                                  'link' => $slider["@attributes"]["link"],
+                                ];
+            }else{
+
+                $returnData[] = [ 'p'    => (strpos($slider["item_url"], 'http') !== false)? $slider["item_url"]: 'http://***REMOVED***.com/***REMOVED***/'.$slider["item_url"],
+                                  'm'    => (strpos($slider["src_mobile"], 'http') !== false)? $slider["src_mobile"]: 'http://***REMOVED***.com/***REMOVED***/'.$slider["src_mobile"],
+                                  'text' => $slider["text"],
+                                  'link' => $slider["link"],
+                                ];                
+            }
         }
 
         return $returnData;
-        //var_dump($xmlStr);
-       // echo json_decode( $xmlStr , true);
-        /*$ROOT_PATH = 'http://127.0.0.1/';
-        $DATA_DIR  = '/***REMOVED***2/data/flash_carousel_data.xml';
 
-        $flashdb = array();
-        if (file_exists($ROOT_PATH . $DATA_DIR . '/flash_carousel_data.xml')){
+    }
 
-            // 兼容v2.7.0及以前版本
-            if (!preg_match_all('/item_url="([^"]+)"\slink="([^"]+)"\stext="([^"]*)"\ssort="([^"]*)"\ssrc_mobile="([^"]*)"/', file_get_contents(ROOT_PATH . DATA_DIR . '/flash_carousel_data.xml'), $t, PREG_SET_ORDER)){
-                preg_match_all('/item_url="([^"]+)"\slink="([^"]+)"\stext="([^"]*)"/', file_get_contents(ROOT_PATH . DATA_DIR . '/flash_carousel_data.xml'), $t, PREG_SET_ORDER);
-            }
+
+
+
+    /*----------------------------------------------------------------
+     | 推薦商品取出
+     |----------------------------------------------------------------
+     |
+     */
+    public function get_recommend( $_type ){
         
-            if (!empty($t)){
+        // 如果傳入的推薦種類不存在 , 直接回傳空字串
+        if( !in_array( $_type , [ 'new' , 'best' , 'hot' ]) ){
 
-                foreach ($t as $key => $val){
+            return array();
+        }
 
-                    $val[4] = isset($val[4]) ? $val[4] : 0;
-                    $flashdb[] = array('src'=>$val[1],'url'=>$val[2],'text'=>$val[3],'sort'=>$val[4],'src_mobile'=>$val[5]);
+        // 如果是熱銷或者推薦 , 就先檢查是否有xml資料
+        if( in_array( $_type , [ 'best' , 'hot' ] ) ){
+            
+            
+                
+                $recommends = [];
+                $xmlStr = @simplexml_load_file("https://***REMOVED***.com/***REMOVED***/data"."/apparel_$_type".".xml");    
+                
+                if( $xmlStr ){
+
+                    $pre = [];
+
+                    $sliders = json_decode(json_encode((array)$xmlStr), TRUE)['item'];
+        
+                    foreach ($sliders as $sliderk => $slider) {
+            
+                        if( array_key_exists('@attributes', $slider)){
+        
+                            $recommends[] = trim($slider["@attributes"]["sn"]);
+                        }else{
+        
+                            $recommends[] = trim($slider["sn"]);                        
+                        }
+                    }
+                    
+                    foreach ($recommends as $recommendk => $recommend ) {
+                        
+                        if( !empty( $recommend ) ){
+                            
+                            $recommend = "NO.".trim($recommend);
+
+                            $tmpPre =  DB::table('goods')
+                                ->where('goods_sn', $recommend)
+                                ->where('is_on_sale',1)
+                                ->where('goods_number','>',0)
+                                ->where('brand_id','!=','116')
+                                ->where('is_alone_sale',1)
+                                ->where('is_delete',0)
+                                ->first();
+                            
+                            $tmpPre = (array)$tmpPre ;
+                            
+                            if( $tmpPre ){
+                                array_push($pre, $tmpPre);
+                            }
+
+                        }
+
+                    }
+
+                    //var_dump($pre);
+
                 }
-            }
+                
+
+            
+        }
+
+        $recommendDB =  DB::table('goods')
+                        ->whereIn('cat_id', [25,103,31,104,113,27,29])
+                        ->where('is_on_sale','1')
+                        ->where('goods_number','>',0)
+                        ->where('brand_id','!=','116')
+                        ->where('is_alone_sale',1)
+                        ->where('is_delete',0);
+
+        if( $_type == 'best' ){
+
+            $recommendDB->where('is_best',1);
+        }
+
+        if( $_type == 'hot' ){
+
+            $recommendDB->where('is_hot',1);
+        }        
+
+        if( in_array( $_type , ['best' , 'hot'] ) ){
+
+            $recommendDB->orderBy('sort_order','ASC');
         }
         
-        return $flashdb;*/
+
+        $returnDatas = $recommendDB->limit(6)->offset(0)->orderBy('add_time','DESC')->get();
+        
+        $returnDatas = json_decode($returnDatas,true);
+        
+       // $returnDatas = $pre + $returnDatas;
+       
+        if( isset($pre) && count($pre)> 0  ){
+            $returnDatas = array_merge($pre,$returnDatas);
+        }
+
+        if( count($returnDatas) > 6 ){
+            return array_slice( $returnDatas , 0 , 6);
+        }else{
+            return $returnDatas;
+        }
+        
+
+        
     }
 }

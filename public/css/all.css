@@ -30,6 +30,11 @@ body{
 	padding-top:4px;
 	padding-bottom: 4px;
 }
+#dropdown1 >li:last-child{
+	border-bottom:0px solid #1c1c1c;
+	padding-top:4px;
+	padding-bottom: 4px;
+}
 #dropdown1 >li >img{
 	width: 100px;
 	height: 100px;
@@ -68,7 +73,14 @@ body{
 #mobileCartBox{
 	display: none;
 }
-
+.emptycart{
+	padding: 20px;
+	height: 60px;
+	line-height: 60px!important;
+}
+.brand-logo img{
+	max-height: 64px;
+}
 @media(max-width: 600px){
 	
 	#mobileCartBox{
@@ -93,11 +105,19 @@ body{
 	}
 }
 @media (max-width: 992px){
+    .brand-logo img{
+	    max-height: 56px;
+    }	
 	#dropdown2 >li{
 	    border-bottom:1px solid #1c1c1c;
 	    padding-top:4px;
 	    padding-bottom: 4px;
     }
+    #dropdown2 >li:last-child{
+	    border-bottom:0px solid #1c1c1c;
+	    padding-top:4px;
+	    padding-bottom: 4px;
+    }    
     #dropdown2 >li >img{
 	    width: 100px;
 	    height: 100px;

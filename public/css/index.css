@@ -45,3 +45,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', e
 .next{
     right: 0px;
 }
+/* 首頁輪播CSS */
+.carousel .carousel-item>picture>img {
+    width: 100%;
+}
+/* 推薦title */
+.recommend_title{
+    border-bottom: 3px solid #ff80ab;
+    color: #ff80ab;
+}
+@media( max-width: 600px){
+    .recommend_title{
+        text-align: center;
+    }
+    .scrollspy.row{
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+}
