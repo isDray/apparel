@@ -1930,7 +1930,7 @@ class EnterController extends Controller
         $log['order_type']   = $type;
         $log['is_paid']      = $is_paid;
         
-        $logId =  DB::table('pay_log')->insert($log);
+        $logId =  DB::table('pay_log')->insertGetId($log);
 
         return $logId;
 

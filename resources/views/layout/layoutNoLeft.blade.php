@@ -117,7 +117,7 @@
         <nav>
             <div class="nav-wrapper pink accent-1">
 
-                <a href="{{url('/')}}" class="brand-logo">Logo</a>
+                <a href="{{url('/')}}" class="brand-logo"><img src="https://***REMOVED***.com/***REMOVED***/ecs_static/img/logo.png"></a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     @foreach( $categorys as $categoryk => $category)
