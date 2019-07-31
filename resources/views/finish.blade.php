@@ -31,6 +31,8 @@
                         @if( $pay_online != false)
                         {!!$pay_online!!}                       
                         @endif
+
+                        <a class="waves-effect waves-light btn" href="{{url('/')}}">回首頁</a>
                     </li> 
             </ul>
 

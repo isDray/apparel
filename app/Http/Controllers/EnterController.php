@@ -742,6 +742,19 @@ class EnterController extends Controller
         'city'            => $request->city 
         );
         
+        $order['from_ad'] = '0';
+        $order['referer'] = '本站';
+    
+        // 如果是來自聯盟網的則需要轉換
+        if( isset($_COOKIE['fromAffiliates']) && !empty($_COOKIE['fromAffiliates']) && $order['from_ad'] == '0' ){
+        
+            $order['from_ad'] = 65;
+        
+            $order['referer'] = '聯盟網'; 
+
+        }
+
+
         $order['extension_code'] = '';
         $order['extension_id'] = 0;
         
@@ -914,6 +927,8 @@ class EnterController extends Controller
 
         }while ( $inSwitch == 1 );
         
+        $order['log_id'] = $this->insert_pay_log( $lastID , $order['order_amount'] , 0);
+
         $cartArr  = $request->session()->get('cart');
 
         $goodList = array_keys( $request->session()->get('cart') );
@@ -1896,7 +1911,28 @@ class EnterController extends Controller
             return $returnDatas;
         }
         
+    }
 
+
+
+
+    /*----------------------------------------------------------------
+     | 付款log
+     |----------------------------------------------------------------
+     |
+     */
+    function insert_pay_log($id, $amount, $type = PAY_SURPLUS, $is_paid = 0){
         
+        $log = [];
+        
+        $log['order_id']     = $id;
+        $log['order_amount'] = $amount;
+        $log['order_type']   = $type;
+        $log['is_paid']      = $is_paid;
+        
+        $logId =  DB::table('pay_log')->insert($log);
+
+        return $logId;
+
     }
 }
