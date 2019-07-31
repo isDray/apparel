@@ -50,12 +50,17 @@
             
             <div class="card-image">
         
-                <picture>
+<!--                 <picture>
                     <source media="(max-width: 600px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}}">
                     <source media="(max-width: 992px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}}">
                     <img src="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}}" alt="Flowers" data-src="">   
-                </picture>  
-
+                </picture>  --> 
+                <img
+                    data-sizes="auto"
+                    
+                    data-srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}},
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}} 600w,
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}} 992w" class="lazyload" alt="{{$firstTen['goods_name']}}-商品圖示"/>
                 <!-- <span class="card-title">Card Title</span> -->
         
             </div>
@@ -87,11 +92,17 @@
             
             <div class="card-image">
         
-                <picture>
+<!--                 <picture>
                     <source media="(max-width: 600px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}}">
                     <source media="(max-width: 992px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}}">
                     <img src="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}}" alt="Flowers" data-src="">   
-                </picture>  
+                </picture>   -->
+                <img
+                    data-sizes="auto"
+                    
+                    data-srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}},
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}} 600w,
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}} 992w" class="lazyload" alt="{{$firstTen['goods_name']}}-商品圖示"/>
 
                 <!-- <span class="card-title">Card Title</span> -->
         
@@ -124,12 +135,17 @@
             
             <div class="card-image">
         
-                <picture>
+<!--                 <picture>
                     <source media="(max-width: 600px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}}">
                     <source media="(max-width: 992px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}}">
                     <img src="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}}" alt="Flowers" data-src="">   
-                </picture>  
-
+                </picture>  --> 
+                <img
+                    data-sizes="auto"
+                    
+                    data-srcset="https://***REMOVED***.com/***REMOVED***/{{$firstTen['original_img']}},
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_thumb']}} 600w,
+                                 https://***REMOVED***.com/***REMOVED***/{{$firstTen['goods_img']}} 992w" class="lazyload" alt="{{$firstTen['goods_name']}}-商品圖示"/>
                 <!-- <span class="card-title">Card Title</span> -->
         
             </div>

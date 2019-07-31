@@ -202,7 +202,7 @@
         </footer>        
         <!-- /footer -->
         <script src="{{ asset('js/jquery.min.js') }}"></script>
-        
+        <script src="{{ asset('js/lazysizes/lazysizes.min.js') }}"></script>
         <script src="{{ asset('materialize/js/materialize.min.js') }}"></script>
         <script type="text/javascript">      
             $(document).ready(function(){
@@ -378,7 +378,7 @@
                 $("#toTop").onclick = function(){
                     document.body.scrollTop = document.documentElement.scrollTop = 0;
                 }
-                
+
             });
         </script>
 
