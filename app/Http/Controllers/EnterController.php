@@ -21,9 +21,26 @@ class EnterController extends Controller
 	public function __construct(){
         
         // 取出服飾分類
-        $categorys = DB::table('category')->select('cat_id', 'cat_name')->whereIn('cat_id', [25,103,31,104,113,27,29])->get();
+
+        $allcloth = DB::table('category')->select('cat_id')->where('parent_id','98')->get();
+        
+        $allcloths = json_decode( $allcloth , True );
+        
+        $allclothArr = [];
+
+        foreach ($allcloths as $allclothk => $allcloth) {
+
+            array_push($allclothArr, $allcloth['cat_id']);
+
+        }
+
+
+        //var_dump($allclothArr);
+
+        $categorys = DB::table('category')->select('cat_id', 'cat_name')->whereIn('cat_id', $allclothArr )->get();
        
         $categorys = json_decode( $categorys , TRUE);
+
 
         View::share('categorys', $categorys);
     }

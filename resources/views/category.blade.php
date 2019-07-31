@@ -23,7 +23,7 @@
                     <img src="https://***REMOVED***.com/***REMOVED***/{{$good['original_img']}}" alt="{{$good['goods_name']}}}">   
                 </picture>  
 
-                <span class="card-title">Card Title</span>
+                <!-- <span class="card-title">Card Title</span> -->
         
             </div>
             

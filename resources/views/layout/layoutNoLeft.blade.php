@@ -24,10 +24,14 @@
 
     <body>
         
+        <a class="btn-floating teal lighten-3" href='#' id='toTop'>
+            <i class="material-icons">expand_less</i>           
+        </a>
+
         <!-- 手機板專用購物車 -->
         <div id="mobileCartBox">
             
-            <a class="dropdown-trigger btn-floating  pink darken-2" href='#' data-target='dropdown2' id='testBtn'>
+            <a class="dropdown-trigger btn-floating  pink darken-2 " href='#' data-target='dropdown2' id='testBtn'>
                 <i class="material-icons">shopping_cart</i>
             </a>
 
@@ -121,8 +125,21 @@
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     @foreach( $categorys as $categoryk => $category)
-                    <li><a href="{{url('/showCategorys/'.$category['cat_id'].'/1')}}">{{$category['cat_name']}}</a></li>
+                        @if( $categoryk < 6 )
+                            <li><a href="{{url('/showCategorys/'.$category['cat_id'].'/1')}}">{{$category['cat_name']}}</a></li>
+                        @endif
                     @endforeach
+
+                    @if( count($categorys) > 6)
+                    <li> <a class='dropdown-trigger' href='#' data-target='dropdown_cat'>更多分類</a></li>
+                    <ul id='dropdown_cat' class='dropdown-content'>
+                        @foreach( $categorys as $categoryk => $category)
+                            @if( $categoryk >= 6)
+                            <li><a href="{{url('/showCategorys/'.$category['cat_id'].'/1')}}">{{$category['cat_name']}}</a></li>
+                            @endif
+                        @endforeach
+                    </ul>
+                    @endif
                     <li>
                         <a class="dropdown-trigger btn-floating  pink darken-2" href='#' data-target='dropdown1' id='cartBtn'><i class="material-icons">shopping_cart</i></a>
                     </li>
@@ -189,7 +206,8 @@
         <script src="{{ asset('materialize/js/materialize.min.js') }}"></script>
         <script type="text/javascript">      
             $(document).ready(function(){
-                $('.sidenav').sidenav();$('.dropdown-toggle').dropdown()
+                $('.sidenav').sidenav();
+                $('.dropdown-toggle').dropdown();
 
                 $('.dropdown-trigger').dropdown({coverTrigger:false,constrainWidth:false,closeOnClick:false});
 
@@ -349,6 +367,18 @@
                         //console.log( "Request failed: " + textStatus );
                     });
                 });
+
+
+
+                /*----------------------------------------------------------------
+                 | 回到頂端
+                 |----------------------------------------------------------------
+                 |
+                 */
+                $("#toTop").onclick = function(){
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                }
+                
             });
         </script>
 
