@@ -72,11 +72,13 @@ class EnterController extends Controller
         // 推薦商品
         $bests = $this->get_recommend( 'best' );
 
+        $description = "享愛服飾 | 性感睡衣 , 角色扮演服 , 性感絲襪網襪 , 各式主題服裝 , 小可愛 , 吊帶襪 , 性感內褲 , 豐富的商品種類 、 快速配送服務 、 完善的售後服務 , 讓您選購到最適合的服飾 ";
+
         return view('index')->with([ 'firstTens' => $news,
                                      'sliders'   => $sliders,
                                      'bests'     => $bests,
                                      'hots'      => $hots,
-
+                                     'description' => $description,
         	                         'title'     => '首頁'
         	                       ]);
 

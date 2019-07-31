@@ -3,7 +3,7 @@
     <head>
         
         <title>@yield('title') - {{config( 'app.name' )}}</title>
-        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=5.0; user-scalable=0;">
         
         
         <meta name="description" content="@yield('description')">
@@ -122,7 +122,7 @@
         <nav>
             <div class="nav-wrapper pink accent-1">
 
-                <a href="{{url('/')}}" class="brand-logo"><img src="https://***REMOVED***.com/***REMOVED***/ecs_static/img/logo.png"></a>
+                <a href="{{url('/')}}" class="brand-logo"><img src="https://***REMOVED***.com/***REMOVED***/ecs_static/img/logo.png" alt="享愛服飾網LOGO-回首頁"></a>
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
                 <ul class="right hide-on-med-and-down">
                     @foreach( $categorys as $categoryk => $category)
@@ -195,7 +195,7 @@
               <div class="col l4 offset-l2 s12">
                 <h5 class="white-text">購物連結</h5>
                 <ul>
-                  <li><a class="grey-text text-lighten-3" href="https://***REMOVED***.com/***REMOVED***" target="_blank" >享愛網</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://***REMOVED***.com/***REMOVED***" target="_blank" rel='noreferrer noopener' >享愛網</a></li>
 <!--                   <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 2</a></li>
                   <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 3</a></li>
                   <li><a class="grey-text text-lighten-3" href="#!" target="_blank" >Link 4</a></li> -->
@@ -212,14 +212,8 @@
         </footer>        
         <!-- /footer -->
         <script src="{{ asset('js/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/vue.min.js') }}"></script>  
         <script src="{{ asset('js/lazysizes/lazysizes.min.js') }}"></script>
-        
         <script src="{{ asset('materialize/js/materialize.min.js') }}"></script>
-
-
-
-    
 
 
         <script type="text/javascript">      

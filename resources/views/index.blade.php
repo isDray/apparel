@@ -2,7 +2,7 @@
 
 @section('title', "$title")
 
-@section('description', '')
+@section('description', "$description")
 @section('keyword', '')
 
 @section('content')
@@ -44,7 +44,7 @@
     <h5><i class="material-icons dp48">turned_in_not</i>最新商品</h5>
     </div>
     @foreach( $firstTens as $firstTenk => $firstTen)
-    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}">
+    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}" aria-label="點此查看-{{$firstTen['goods_name']}}的詳細內容" >
     <div class="col s6 m6 l4">
         <div class="card hoverable ">
             
@@ -86,7 +86,7 @@
     <h5><i class="material-icons dp48">turned_in_not</i>熱銷商品</h5>
     </div>
     @foreach( $hots as $firstTenk => $firstTen)
-    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}">
+    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}" aria-label="點此查看-{{$firstTen['goods_name']}}的詳細內容">
     <div class="col s6 m6 l4">
         <div class="card hoverable ">
             
@@ -129,7 +129,7 @@
     <h5><i class="material-icons dp48">turned_in_not</i>推薦商品</h5>
     </div>
     @foreach( $bests as $firstTenk => $firstTen)
-    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}">
+    <a href="{{url('/showGoods/'.$firstTen['goods_id'])}}" aria-label="點此查看-{{$firstTen['goods_name']}}的詳細內容" >
     <div class="col s6 m6 l4">
         <div class="card hoverable ">
             
