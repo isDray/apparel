@@ -53,7 +53,7 @@
             @endphp
             @endforeach
 
-            @if( count(Session::get('cart')) )
+            @if( count(Session::get('cart')))
             <li>
             <div class='right-align' style='padding-right:15px;'>
                 共:{{$cartTotal}}
@@ -68,8 +68,13 @@
             </li>
             @endif
 
+        @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>        
         @endif
         </ul>
+
         <ul id='dropdown1' class='dropdown-content collection'>
         @if(Session::has('cart'))
             @php
@@ -102,6 +107,10 @@
             購物車內無商品
             </li>
             @endif
+        @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>        
         @endif
         </ul>
 

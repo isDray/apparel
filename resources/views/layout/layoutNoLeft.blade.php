@@ -52,14 +52,26 @@
                 $cartTotal += $cartdata['subTotal'];
             @endphp
             @endforeach
+
+            @if( count(Session::get('cart')))
             <li>
             <div class='right-align' style='padding-right:15px;'>
                 共:{{$cartTotal}}
             </div>
             <div class='right-align'>
-                <a class="waves-effect waves-light btn">去結帳</a>
+                <a href="{{url('/checkout')}}" class="waves-effect waves-light btn">去結帳</a>
             </div>
             </li>
+            @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>
+            @endif
+
+        @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>        
         @endif
         </ul>
         <ul id='dropdown1' class='dropdown-content collection'>
@@ -80,6 +92,7 @@
                 $cartTotal += $cartdata['subTotal'];
             @endphp
             @endforeach
+            @if( count(Session::get('cart')) )
             <li>
             <div class='right-align' style='padding-right:15px;'>
                 共:{{$cartTotal}}
@@ -88,6 +101,15 @@
                 <a  href="{{url('/checkout')}}" class="waves-effect waves-light btn">去結帳</a>
             </div>
             </li>
+            @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>
+            @endif
+        @else
+            <li class='emptycart'>
+            購物車內無商品
+            </li>        
         @endif
         </ul>
 
