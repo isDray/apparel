@@ -12,17 +12,23 @@
 <div class="col s12 m12 l12 page_main">
     
     @foreach( $goods as $goodk => $good)
-    <a href="{{url('/showGoods'.'/'.$good['goods_id'])}}">
+    <a href="{{url('/showGoods'.'/'.$good['goods_id'])}}" aria-label="點此查看-{{$good['goods_name']}}的詳細內容">
     <div class="col s6 m6 l3">
         <div class="card hoverable ">
             <div class="card-image">
         
-                <picture>
+<!--                 <picture>
                     <source media="(max-width: 600px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$good['goods_thumb']}}">
                     <source media="(max-width: 992px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$good['goods_img']}}">
                     <img src="https://***REMOVED***.com/***REMOVED***/{{$good['original_img']}}" alt="{{$good['goods_name']}}}">   
-                </picture>  
+                </picture>   -->
 
+                <img
+                    data-sizes="auto"
+                    
+                    data-srcset="https://***REMOVED***.com/***REMOVED***/{{$good['original_img']}},
+                                 https://***REMOVED***.com/***REMOVED***/{{$good['goods_thumb']}} 600w,
+                                 https://***REMOVED***.com/***REMOVED***/{{$good['goods_img']}} 992w" class="lazyload" alt="{{$good['goods_name']}}-商品圖示"/>
                 <!-- <span class="card-title">Card Title</span> -->
         
             </div>

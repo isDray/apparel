@@ -312,6 +312,10 @@ class EnterController extends Controller
 
             $request->page = 1;
         }
+        
+        // 取出分類名稱 
+        $category = DB::table('category')->where('cat_id', $request->id )->first();
+
 
         // 取出頁面商品
         $goods = DB::table('goods')->where('cat_id', $request->id )
@@ -324,9 +328,12 @@ class EnterController extends Controller
         
         $pageHtml = $this->getPageList( $request->page , $this->showNum , $total , 6 , 6 , url('/showCategorys/'.$request->id.'/') );
 
+        $description = "$category->cat_name 專區 | 享愛服飾";
+
         return view('category')->with([ 'goods' => $goods,
-                                        'title' => '分類頁面',
+                                        'title' => $category->cat_name."專區 | 享愛服飾",
                                         'pageHtml' => $pageHtml,
+                                        'description' => $description
                                      ]);        
 
     }
