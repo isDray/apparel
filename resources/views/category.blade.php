@@ -2,7 +2,7 @@
 
 @section('title', "$title")
 
-@section('description', '')
+@section('description', "$description")
 @section('keyword', '')
 
 @section('content')

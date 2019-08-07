@@ -328,7 +328,7 @@ class EnterController extends Controller
         
         $pageHtml = $this->getPageList( $request->page , $this->showNum , $total , 6 , 6 , url('/showCategorys/'.$request->id.'/') );
 
-        $description = "$category->cat_name 專區 | 享愛服飾";
+        $description = "$category->cat_name 專區 , 提供多樣{$category->cat_name}類商品比較參考 | 享愛服飾";
 
         return view('category')->with([ 'goods' => $goods,
                                         'title' => $category->cat_name."專區 | 享愛服飾",
@@ -364,14 +364,15 @@ class EnterController extends Controller
         $goodsImg = DB::table('goods_gallery')
                      ->where('goods_id', $request->id )
                      ->get();
-
+   
         $goodsImgs = json_decode($goodsImg,True);
         
-
+        $description = "{$goods['goods_name']} 商品詳細資訊 , 一鍵加入購物車立即購買 | 享愛服飾";
         // 如果商品存在 , 則直接呈現內頁
         return view('goods')->with([ 'goods' => $goods,
                                      'title' => "{$goods['goods_name']}",
                                      'goodsImgs' => $goodsImgs,
+                                     'description' => $description
                                    ]);         
     }
     

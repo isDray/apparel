@@ -2,7 +2,7 @@
 
 @section('title', "$title")
 
-@section('description', '')
+@section('description', "$description")
 @section('keyword', '')
 
 @section('content')
@@ -44,7 +44,7 @@
 
             <h2>商品編號:{{ $goods['goods_sn'] }}</h2>
            
-            <p>數量:
+            <p><label for="num">數量:</label>
                  
                 @if( $goods['goods_number'] > 0)
                 <select name='num' id='num'> 
@@ -68,11 +68,14 @@
     <div class="col s12 m12 l12">
         <div class="card-panel" id='detail_box'>
         @foreach( $goodsImgs as $goodsImgk => $goodsImg )
-        <picture>
-            <!-- <source media="(max-width: 600px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$goodsImg['thumb_url']}}"> -->
-            <source media="(max-width: 992px)" srcset="https://***REMOVED***.com/***REMOVED***/{{$goodsImg['img_url']}}">
-            <img src="https://***REMOVED***.com/***REMOVED***/{{$goodsImg['img_original']}}" alt="{{$goods['goods_name']}}-詳細圖片-{{$goodsImgk+1}}">   
-        </picture>          
+
+            
+            <img
+                data-sizes="auto"
+                    
+                data-srcset="https://***REMOVED***.com/***REMOVED***/{{$goodsImg['img_original']}}" class="lazyload" alt="{{$goods['goods_name']}}-商品詳細圖-{{$goodsImgk+1}}"/>
+            
+         
         @endforeach
         {!!$goods['goods_desc']!!}
         </div>
@@ -104,9 +107,10 @@ select{
     border:1px solid #a0a0a0;
     height: auto;
 }
-#operateBox p , h2{
+#operateBox p , h2 , #operateBox p label{
     font-size: 20px;
     font-weight: 900;
+    color:black;
 }
 #prepare{
     color:red;
