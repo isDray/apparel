@@ -119,6 +119,15 @@ select{
 
     overflow: hidden;
 }
+#detail_box{
+    overflow: hidden;
+}
+#detail_box img {
+    max-width: 100%;
+}
+#detail_box > picture{
+    max-width: 100%;
+}
 #detail_box > picture > img {
 
     max-width: 100%;
