@@ -18,7 +18,7 @@
 <!--       <a class="carousel-item" href="#one!">
         <img src="http://127.0.0.1/***REMOVED***2/{{$slider['p']}}" alt="活動訊息{{$sliderk}}"> 
         </a> -->
-        <a class="carousel-item" href="@if( $slider['link'] != 'http://' )){{$slider['link']}}@else#@endif">
+        <a class="carousel-item" href="@if( $slider['link'] != 'http://'){{$slider['link']}}@else # @endif">
             <picture>
                 <source media="(max-width: 440px)" srcset="{{$slider['m']}}">
                 <img src="{{$slider['p']}}" alt="活動訊息{{$sliderk}}-{{$slider['text']}}">   
@@ -186,13 +186,8 @@
 
 @section('selfJs')
 <script type="text/javascript">
-
-$(document).ready(function(){
-
-    scrollHright = $(".navbar-fixed").height();
-
-    $('.scrollspy').scrollSpy({scrollOffset:scrollHright});
-
+window.onload =function() {
+    
     $('.carousel').carousel({ 'shift':200,
         'duration':200,
         'indicators':true,
@@ -212,6 +207,32 @@ $(document).ready(function(){
     $(".next").click(function(){
         instance.next(1);
     });
+}
+$(document).ready(function(){
+
+    scrollHright = $(".navbar-fixed").height();
+
+    $('.scrollspy').scrollSpy({scrollOffset:scrollHright});
+
+    // $('.carousel').carousel({ 'shift':200,
+    //     'duration':200,
+    //     'indicators':true,
+    // });
+    
+    // $('.carousel.carousel-slider').carousel({
+    //     fullWidth: true,
+    //     indicators: true
+    // });
+
+    // var instance = M.Carousel.getInstance($('.carousel.carousel-slider'));
+    
+    // $(".pre").click(function(){
+    //     instance.prev(1);
+    // });
+
+    // $(".next").click(function(){
+    //     instance.next(1);
+    // });
 
     elementPosition = $('.pin-top').offset();
     $('.pin-top').css('position', 'fixed').css('top', scrollHright+15);    
